@@ -1,0 +1,19 @@
+.alertas {
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+}
+
+.alerta {
+  padding: 10px;
+  border-radius: 8px;
+  margin-bottom: 10px;
+}
+
+.alerta.critico {
+  background: #fee2e2;
+}
+
+.alerta.preventivo {
+  background: #fef3c7;
+}

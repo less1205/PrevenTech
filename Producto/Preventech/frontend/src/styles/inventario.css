@@ -1,0 +1,77 @@
+.inventario-container {
+  padding: 20px;
+}
+
+/* HEADER */
+.inventario-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.btn-agregar {
+  background: #3b82f6;
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+/* FILTROS */
+.filtros {
+  margin: 20px 0;
+  display: flex;
+  gap: 10px;
+}
+
+.filtros select {
+  padding: 8px;
+  border-radius: 6px;
+}
+
+/* TABLA */
+.tabla-container {
+  background: white;
+  border-radius: 12px;
+  padding: 15px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th {
+  text-align: left;
+  font-size: 12px;
+  color: gray;
+  padding: 10px;
+}
+
+td {
+  padding: 12px;
+  border-top: 1px solid #eee;
+}
+
+/* ESTADOS */
+.estado {
+  padding: 5px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+}
+
+.estado.verde {
+  background: #dcfce7;
+  color: #16a34a;
+}
+
+.estado.amarillo {
+  background: #fef3c7;
+  color: #d97706;
+}
+
+.estado.rojo {
+  background: #fee2e2;
+  color: #dc2626;
+}

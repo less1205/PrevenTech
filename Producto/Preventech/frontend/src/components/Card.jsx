@@ -1,8 +1,16 @@
-function Card({ titulo, numero }) {
+import "../styles/card.css";
+
+function Card({ titulo, numero, color, icono, badge }) {
   return (
-    <div className="card-box">
-      <h3>{titulo}</h3>
-      <h1>{numero}</h1>
+    <div className={`card card-${color}`}>
+      <div className="card-top">
+        <div className="icon-placeholder">{icono}</div> 
+        <span className="badge">{badge}</span>
+      </div>
+      <div className="card-bottom">
+        <p className="numero">{numero}</p>
+        <h3 className="titulo">{titulo}</h3>
+      </div>
     </div>
   );
 }
