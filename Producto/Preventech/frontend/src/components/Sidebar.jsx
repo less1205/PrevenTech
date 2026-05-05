@@ -15,7 +15,6 @@ function Sidebar() {
         </div>
       </div>
 
-      {/* MENU */}
       <nav className="menu">
         <NavLink to="/dashboard" className="item" icono={"📊"}>
           Dashboard
