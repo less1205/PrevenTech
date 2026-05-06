@@ -24,16 +24,16 @@ function Sidebar() {
           Inventario
         </NavLink>
 
-        <NavLink to="/reportes" className="item" icono={"📈"}>
-          Reportes
-        </NavLink>
-
         <NavLink to="/usuarios" className="item" icono={"👥"}>
           Usuarios
         </NavLink>
 
         <NavLink to="/equipos" className="item">
           Equipos
+        </NavLink>
+
+        <NavLink to="/mantenciones" className="item">
+          Mantenciones
         </NavLink>
 
       </nav>

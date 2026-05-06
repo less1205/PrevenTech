@@ -57,21 +57,21 @@
 .filtros input {
   padding: 10px;
   border-radius: 8px;
-  border: 1px solid #ccc;
+  border: 1px solid #e06161;
 }
 
 .filtros button {
   padding: 10px 15px;
   border: none;
   background: #0d6efd;
-  color: white;
+  color: rgb(60, 15, 184);
   border-radius: 8px;
   cursor: pointer;
   transition: 0.3s;
 }
 
 .filtros button:hover {
-  background: #0b5ed7;
+  background: #5ca2e4;
 }
 
 .tabla {
