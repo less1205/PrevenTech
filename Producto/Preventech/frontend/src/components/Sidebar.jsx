@@ -31,6 +31,11 @@ function Sidebar() {
         <NavLink to="/usuarios" className="item" icono={"👥"}>
           Usuarios
         </NavLink>
+
+        <NavLink to="/equipos" className="item">
+          Equipos
+        </NavLink>
+
       </nav>
 
       <div className="perfil" onClick={() => navigate("/perfil")}>

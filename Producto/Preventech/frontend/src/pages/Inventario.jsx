@@ -4,7 +4,7 @@ function Inventario() {
   return (
     <div className="inventario-container">
 
-      {/* HEADER */}
+      
       <div className="inventario-header">
         <div>
           <h1>Gestión de Inventario</h1>
@@ -16,7 +16,7 @@ function Inventario() {
         </button>
       </div>
 
-      {/* FILTROS */}
+  
       <div className="filtros">
         <select>
           <option>Todas las Categorías</option>
@@ -31,7 +31,7 @@ function Inventario() {
         </select>
       </div>
 
-      {/* TABLA */}
+
       <div className="tabla-container">
         <table>
           <thead>
