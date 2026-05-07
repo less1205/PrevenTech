@@ -8,6 +8,9 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToOne;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -19,14 +22,17 @@ import lombok.NoArgsConstructor;
 
 @Entity
 public class Alerta {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Enumerated(EnumType.STRING)
     private Color color;
-
     private String mensaje;
-    
-    
+
+    @OneToOne
+    @JoinColumn(name = "mantencion_id")
+    private Mantencion mantencion;
+
 }
