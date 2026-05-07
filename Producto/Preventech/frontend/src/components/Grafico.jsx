@@ -1,52 +1,10 @@
-import {
-  PieChart,
-  Pie,
-  Cell,
-  Tooltip,
-  ResponsiveContainer
-} from "recharts";
+import { PieChart, Pie } from "recharts";
 
-const COLORS = [
-  "#e84118",
-  "#fbc531",
-  "#4cd137"
-];
-
-function Grafico({ datos }) {
-
+function Grafico() {
   return (
-
-    <ResponsiveContainer width="100%" height={300}>
-
-      <PieChart>
-
-        <Pie
-          data={datos}
-          dataKey="value"
-          nameKey="name"
-          cx="50%"
-          cy="50%"
-          outerRadius={90}
-          innerRadius={50}
-          paddingAngle={4}
-        >
-
-          {datos.map((entry, index) => (
-
-            <Cell
-              key={`cell-${index}`}
-              fill={COLORS[index % COLORS.length]}
-            />
-
-          ))}
-
-        </Pie>
-
-        <Tooltip />
-
-      </PieChart>
-
-    </ResponsiveContainer>
+    <PieChart width={200} height={200}>
+      <Pie data={[{ value: 10 }, { value: 20 }]} dataKey="value" />
+    </PieChart>
   );
 }
 
