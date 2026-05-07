@@ -1,5 +1,6 @@
 package com.preventech.backend.entities;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.preventech.backend.enums.Color;
 
 import jakarta.persistence.*;
@@ -10,7 +11,6 @@ import lombok.NoArgsConstructor;
 
 @NoArgsConstructor
 @AllArgsConstructor
-
 @Data
 
 @Entity
@@ -22,10 +22,11 @@ public class Alerta {
 
     @Enumerated(EnumType.STRING)
     private Color color;
+
     private String mensaje;
 
+    @JsonBackReference("mantencion-alerta")
     @OneToOne
     @JoinColumn(name = "mantencion_id")
     private Mantencion mantencion;
-
 }

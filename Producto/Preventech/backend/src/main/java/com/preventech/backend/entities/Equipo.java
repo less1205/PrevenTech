@@ -13,7 +13,6 @@ import lombok.NoArgsConstructor;
 
 @NoArgsConstructor
 @AllArgsConstructor
-
 @Data
 
 @Entity
@@ -29,8 +28,11 @@ public class Equipo {
     private String ubicacion;
     private String estado;
 
-    @JsonManagedReference
-    @OneToMany(mappedBy = "equipo")
+    @JsonManagedReference("equipo-mantencion")
+    @OneToMany(
+        mappedBy = "equipo",
+        cascade = CascadeType.ALL,
+        orphanRemoval = true
+    )
     private List<Mantencion> mantenciones;
-
 }

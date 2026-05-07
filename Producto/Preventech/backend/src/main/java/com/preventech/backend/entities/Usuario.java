@@ -2,6 +2,7 @@ package com.preventech.backend.entities;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.preventech.backend.enums.Rol;
 
 import jakarta.persistence.*;
@@ -11,7 +12,6 @@ import lombok.NoArgsConstructor;
 
 @NoArgsConstructor
 @AllArgsConstructor
-
 @Data
 
 @Entity
@@ -29,6 +29,7 @@ public class Usuario {
     @Enumerated(EnumType.STRING)
     private Rol rol;
 
+    @JsonManagedReference("usuario-mantencion")
     @OneToMany(mappedBy = "usuario")
     private List<Mantencion> mantenciones;
 }
