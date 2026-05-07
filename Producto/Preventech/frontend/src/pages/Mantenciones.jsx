@@ -1,111 +1,191 @@
-import "../styles/alertas.css";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import "../styles/mantenciones.css";
 
 function Mantenciones() {
+
   const [filtro, setFiltro] = useState("todos");
 
-  // 👇 inputs (lo que escribe el usuario)
   const [fechaInicio, setFechaInicio] = useState("");
   const [fechaFin, setFechaFin] = useState("");
 
-  // 👇 filtros aplicados (lo que realmente filtra)
   const [fechaInicioFiltro, setFechaInicioFiltro] = useState("");
   const [fechaFinFiltro, setFechaFinFiltro] = useState("");
 
-  // 🔥 botón filtrar
+  const [mantenciones, setMantenciones] = useState([]);
+
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    obtenerMantenciones();
+  }, []);
+
+  const obtenerMantenciones = async () => {
+
+    try {
+
+      const response = await fetch(
+        "http://localhost:8080/api/mantenciones"
+      );
+
+      if (!response.ok) {
+        throw new Error(`Error HTTP: ${response.status}`);
+      }
+
+      const data = await response.json();
+
+      setMantenciones(data);
+
+    } catch (error) {
+
+      console.error(
+        "Error cargando mantenciones:",
+        error
+      );
+
+    } finally {
+
+      setLoading(false);
+
+    }
+  };
+
   const aplicarFiltro = () => {
+
     setFechaInicioFiltro(fechaInicio);
     setFechaFinFiltro(fechaFin);
+
   };
 
   const limpiarFiltro = () => {
+
     setFechaInicio("");
     setFechaFin("");
+
     setFechaInicioFiltro("");
     setFechaFinFiltro("");
+
+    setFiltro("todos");
+
   };
 
-  const equipos = [
-    { nombre: "Compresor", estado: "vencido", fecha: "2026-03-10" },
-    { nombre: "Motor", estado: "vencido", fecha: "2026-03-01" },
-    { nombre: "Generador", estado: "vencido", fecha: "2026-02-15" },
-    { nombre: "Bomba presión", estado: "vencido", fecha: "2026-01-20" },
-    { nombre: "Turbina", estado: "vencido", fecha: "2026-02-01" },
+  const total = mantenciones.length;
 
-    { nombre: "Bomba agua", estado: "proximo", fecha: "2026-04-20" },
-    { nombre: "Ventilador industrial", estado: "proximo", fecha: "2026-04-25" },
-    { nombre: "Sistema HVAC", estado: "proximo", fecha: "2026-04-28" },
-    { nombre: "Caldera", estado: "proximo", fecha: "2026-04-30" },
+  const vencidos = mantenciones.filter(
+    (m) => m.estado === "VENCIDO"
+  ).length;
 
-    { nombre: "Panel solar", estado: "al_dia", fecha: "2026-05-20" },
-    { nombre: "UPS", estado: "al_dia", fecha: "2026-06-10" },
-    { nombre: "Servidor", estado: "al_dia", fecha: "2026-06-15" },
-    { nombre: "Transformador", estado: "al_dia", fecha: "2026-07-01" },
-    { nombre: "Iluminación planta", estado: "al_dia", fecha: "2026-07-10" },
-  ];
+  const proximos = mantenciones.filter(
+    (m) => m.estado === "PROXIMO"
+  ).length;
 
-  // 📊 CONTADORES
-  const total = equipos.length;
-  const vencidos = equipos.filter(e => e.estado === "vencido").length;
-  const proximos = equipos.filter(e => e.estado === "proximo").length;
-  const alDia = equipos.filter(e => e.estado === "al_dia").length;
+  const alDia = mantenciones.filter(
+    (m) => m.estado === "AL_DIA"
+  ).length;
 
-  // ✅ FILTRO REAL (usa los filtros aplicados)
-  const equiposFiltrados = equipos.filter(e => {
+  const mantencionesFiltradas = mantenciones.filter((m) => {
+
+    const estado = (m.estado || "").toUpperCase();
+
     const cumpleEstado =
-      filtro === "todos" || e.estado === filtro;
+      filtro === "todos" ||
+      estado === filtro;
 
-    const fechaEquipo = new Date(e.fecha);
-    const inicio = fechaInicioFiltro ? new Date(fechaInicioFiltro) : null;
-    const fin = fechaFinFiltro ? new Date(fechaFinFiltro) : null;
+    const fechaMantencion = m.fecha
+      ? new Date(m.fecha)
+      : null;
+
+    const inicio = fechaInicioFiltro
+      ? new Date(fechaInicioFiltro)
+      : null;
+
+    const fin = fechaFinFiltro
+      ? new Date(fechaFinFiltro)
+      : null;
 
     const cumpleFecha =
-      (!inicio || fechaEquipo >= inicio) &&
-      (!fin || fechaEquipo <= fin);
+      (!inicio || !fechaMantencion || fechaMantencion >= inicio) &&
+      (!fin || !fechaMantencion || fechaMantencion <= fin);
 
     return cumpleEstado && cumpleFecha;
+
   });
 
+  if (loading) {
+    return <h2>Cargando mantenciones...</h2>;
+  }
+
   return (
-    <div className="reportes-container">
 
-      <h1>Mantenciones</h1>
+    <div className="mantenciones-container container-fluid p-4">
 
-      {/* CARDS */}
-      <div className="reportes-cards">
-        <div className="card verde" onClick={() => setFiltro("al_dia")}>
+      <h1 className="mb-4">
+        Mantenciones
+      </h1>
+
+      <div className="mantenciones-cards mb-4">
+
+        <div
+          className="mantencion-card verde"
+          onClick={() => setFiltro("AL_DIA")}
+        >
+
           <span>Al día</span>
+
           <h2>{alDia}</h2>
+
         </div>
 
-        <div className="card amarillo" onClick={() => setFiltro("proximo")}>
+        <div
+          className="mantencion-card amarillo"
+          onClick={() => setFiltro("PROXIMO")}
+        >
+
           <span>Próximas</span>
+
           <h2>{proximos}</h2>
+
         </div>
 
-        <div className="card rojo" onClick={() => setFiltro("vencido")}>
+        <div
+          className="mantencion-card rojo"
+          onClick={() => setFiltro("VENCIDO")}
+        >
+
           <span>Vencidas</span>
+
           <h2>{vencidos}</h2>
+
         </div>
 
-        <div className="card" onClick={() => setFiltro("todos")}>
+        <div
+          className="mantencion-card"
+          onClick={() => setFiltro("todos")}
+        >
+
           <span>Total</span>
+
           <h2>{total}</h2>
+
         </div>
+
       </div>
 
-      {/* FILTRO FECHA */}
       <div className="filtros">
+
         <input
           type="date"
           value={fechaInicio}
-          onChange={(e) => setFechaInicio(e.target.value)}
+          onChange={(e) =>
+            setFechaInicio(e.target.value)
+          }
         />
 
         <input
           type="date"
           value={fechaFin}
-          onChange={(e) => setFechaFin(e.target.value)}
+          onChange={(e) =>
+            setFechaFin(e.target.value)
+          }
         />
 
         <button onClick={aplicarFiltro}>
@@ -115,40 +195,92 @@ function Mantenciones() {
         <button onClick={limpiarFiltro}>
           Limpiar
         </button>
+
       </div>
 
-      {/* TABLA */}
       <table className="tabla">
+
         <thead>
+
           <tr>
+
             <th>Equipo</th>
-            <th>Fecha Mantención</th>
-            <th>Tipo</th>
+            <th>Fecha</th>
+            <th>Detalle</th>
             <th>Estado</th>
             <th>Próxima</th>
+            <th>Técnico</th>
+
           </tr>
+
         </thead>
 
         <tbody>
-          {equiposFiltrados.length === 0 ? (
+
+          {mantencionesFiltradas.length === 0 ? (
+
             <tr>
-              <td colSpan="5">No hay resultados</td>
+
+              <td colSpan="6">
+                No hay resultados
+              </td>
+
             </tr>
+
           ) : (
-            equiposFiltrados.map((equipo, index) => (
-              <tr key={index}>
-                <td>{equipo.nombre}</td>
-                <td>{equipo.fecha}</td>
-                <td>Preventiva</td>
+
+            mantencionesFiltradas.map((mantencion) => (
+
+              <tr key={mantencion.id}>
+
                 <td>
-                  {equipo.estado === "vencido" && "🔴 Vencida"}
-                  {equipo.estado === "proximo" && "🟡 Próxima"}
-                  {equipo.estado === "al_dia" && "🟢 Al día"}
+
+                  {mantencion.equipo?.nombre}
+
                 </td>
-                <td>-</td>
+
+                <td>
+
+                  {mantencion.fecha}
+
+                </td>
+
+                <td>
+
+                  {mantencion.detalle}
+
+                </td>
+
+                <td>
+
+                  {mantencion.estado === "VENCIDO" &&
+                    "🔴 Vencido"}
+
+                  {mantencion.estado === "PROXIMO" &&
+                    "🟡 Próximo"}
+
+                  {mantencion.estado === "AL_DIA" &&
+                    "🟢 Al día"}
+
+                </td>
+
+                <td>
+
+                  {mantencion.proximaFecha}
+
+                </td>
+
+                <td>
+
+                  {mantencion.usuario?.nombre}
+
+                </td>
+
               </tr>
+
             ))
           )}
+
         </tbody>
 
       </table>

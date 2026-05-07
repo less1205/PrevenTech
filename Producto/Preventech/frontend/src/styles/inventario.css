@@ -1,64 +1,57 @@
 .inventario-container {
-  padding: 20px;
+  min-height: 100vh;
+  background: #f4f6f8;
 }
 
-/* HEADER */
-.inventario-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+.inventario-header h1 {
+  color: #1e293b;
+  font-weight: 700;
 }
 
 .btn-agregar {
-  background: #3b82f6;
-  color: white;
-  border: none;
-  padding: 10px 15px;
-  border-radius: 8px;
-  cursor: pointer;
+  border-radius: 10px;
+  font-weight: 600;
+  padding: 10px 18px;
 }
 
-/* FILTROS */
-.filtros {
-  margin: 20px 0;
-  display: flex;
-  gap: 10px;
+.filtros select,
+.filtros input {
+  border-radius: 10px;
+  min-width: 180px;
 }
 
-.filtros select {
-  padding: 8px;
-  border-radius: 6px;
-}
-
-/* TABLA */
 .tabla-container {
   background: white;
-  border-radius: 12px;
-  padding: 15px;
+  border-radius: 16px;
+  overflow: hidden;
+
+  box-shadow: 0 4px 15px rgba(0,0,0,0.05);
 }
 
-table {
-  width: 100%;
-  border-collapse: collapse;
+.table {
+  margin-bottom: 0;
 }
 
-th {
-  text-align: left;
-  font-size: 12px;
-  color: gray;
-  padding: 10px;
+.table thead {
+  background: #f8fafc;
 }
 
-td {
-  padding: 12px;
-  border-top: 1px solid #eee;
+.table th {
+  font-size: 13px;
+  color: #64748b;
+  font-weight: 600;
+  border: none;
 }
 
-/* ESTADOS */
+.table td {
+  vertical-align: middle;
+}
+
 .estado {
-  padding: 5px 10px;
-  border-radius: 20px;
+  padding: 6px 12px;
+  border-radius: 30px;
   font-size: 12px;
+  font-weight: 600;
 }
 
 .estado.verde {

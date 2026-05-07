@@ -1,11 +1,15 @@
 .sidebar {
   width: 250px;
-  height: 100vh;
+  min-height: 100vh;
+  flex-shrink: 0;
+
   background: #1e2a78;
   color: white;
+
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+
   padding: 20px;
 }
 
@@ -35,7 +39,6 @@
   opacity: 0.7;
 }
 
-
 .menu {
   margin-top: 30px;
   display: flex;
@@ -60,8 +63,6 @@
   border-left: 4px solid #60a5fa;
 }
 
-
-
 .perfil {
   display: flex;
   align-items: center;
@@ -75,11 +76,20 @@
 .avatar {
   width: 40px;
   height: 40px;
-  background: linear-gradient(45deg, #a78bfa, #60a5fa);
+
+  /* SOLO CAMBIÓ EL COLOR */
+  background: linear-gradient(
+    45deg,
+    #60a5fa,
+    #3b82f6
+  );
+
   border-radius: 50%;
+
   display: flex;
   align-items: center;
   justify-content: center;
+
   font-weight: bold;
 }
 
