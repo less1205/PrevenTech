@@ -1,13 +1,10 @@
 package com.preventech.backend.entities;
 
+import java.util.List;
+
 import com.preventech.backend.enums.Rol;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -19,14 +16,19 @@ import lombok.NoArgsConstructor;
 
 @Entity
 public class Usuario {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String nombre;
+
+    @Column(unique = true)
     private String email;
     private String password;
-    
+
     @Enumerated(EnumType.STRING)
     private Rol rol;
 
+    @OneToMany(mappedBy = "usuario")
+    private List<Mantencion> mantenciones;
 }

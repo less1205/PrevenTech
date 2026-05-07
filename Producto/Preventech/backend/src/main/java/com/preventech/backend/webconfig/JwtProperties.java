@@ -11,6 +11,7 @@ public class JwtProperties {
     private long expiration;
     private String prefix;
     private String header;
+    private long clockSkew; 
     
     public String getSecret() {
         return secret;
@@ -37,6 +38,12 @@ public class JwtProperties {
         this.header = header;
     }
 
-    
+    public long getClockSkew() {
+        return clockSkew;
+    }
+
+    public void setClockSkew(long clockSkew) {
+        this.clockSkew = clockSkew;
+    }
 
 }

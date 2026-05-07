@@ -1,6 +1,7 @@
 package com.preventech.backend.controllers;
 
 import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -10,35 +11,35 @@ import com.preventech.backend.services.UsuarioService;
 
 @CrossOrigin(origins = "http://localhost:5173")
 @RestController
-@RequestMapping("/api/Usuario")
+@RequestMapping("/api/usuarios")
 public class UsuarioRestController {
 
     @Autowired
-    private UsuarioService UsuarioService;
+    private UsuarioService usuarioService;
 
     @PostMapping
-    public ResponseEntity<Usuario> crear(@RequestBody Usuario Usuario) {
-        return ResponseEntity.ok(UsuarioService.crear(Usuario));
+    public ResponseEntity<Usuario> crear(@RequestBody Usuario usuario) {
+        return ResponseEntity.ok(usuarioService.crear(usuario));
     }
 
     @GetMapping
     public ResponseEntity<List<Usuario>> listar() {
-        return ResponseEntity.ok(UsuarioService.listarTodos());
+        return ResponseEntity.ok(usuarioService.listarTodos());
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<Usuario> obtener(@PathVariable Long id) {
-        return ResponseEntity.ok(UsuarioService.obtenerId(id));
+        return ResponseEntity.ok(usuarioService.obtenerId(id));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Usuario> actualizar(@PathVariable Long id, @RequestBody Usuario Usuario) {
-        return ResponseEntity.ok(UsuarioService.actualizar(id, Usuario));
+    public ResponseEntity<Usuario> actualizar(@PathVariable Long id, @RequestBody Usuario usuario) {
+        return ResponseEntity.ok(usuarioService.actualizar(id, usuario));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> eliminar(@PathVariable Long id) {
-        UsuarioService.eliminar(id);
+        usuarioService.eliminar(id);
         return ResponseEntity.noContent().build();
     }
 }

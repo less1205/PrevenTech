@@ -53,8 +53,8 @@ public class MantencionServiceImpl implements MantencionService {
             existente.setDetalle(mantencionActualizada.getDetalle());
         }
 
-        if (mantencionActualizada.getEvidenciaURL() != null) {
-            existente.setEvidenciaURL(mantencionActualizada.getEvidenciaURL());
+        if (mantencionActualizada.getEvidenciaUrl() != null) {
+            existente.setEvidenciaUrl(mantencionActualizada.getEvidenciaUrl());
         }
 
         if (mantencionActualizada.getProximaFecha() != null) {

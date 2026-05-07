@@ -10,7 +10,7 @@ import com.preventech.backend.services.AlertaService;
 
 @CrossOrigin(origins = "http://localhost:5173")
 @RestController
-@RequestMapping("/api/Alerta")
+@RequestMapping("/api/alertas")
 public class AlertaRestController {
 
     @Autowired

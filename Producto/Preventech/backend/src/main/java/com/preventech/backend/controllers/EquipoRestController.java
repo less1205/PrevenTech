@@ -11,7 +11,7 @@ import com.preventech.backend.services.EquipoService;
 
 @CrossOrigin(origins = "http://localhost:5173")
 @RestController
-@RequestMapping("/api/Equipo")
+@RequestMapping("/api/equipos")
 public class EquipoRestController {
 
     @Autowired
@@ -19,45 +19,27 @@ public class EquipoRestController {
 
     @PostMapping
     public ResponseEntity<Equipo> crear(@RequestBody Equipo equipo) {
-
-        return ResponseEntity.ok(
-                equipoService.crear(equipo)
-        );
+        return ResponseEntity.ok(equipoService.crear(equipo));
     }
 
     @GetMapping
     public ResponseEntity<List<Equipo>> listar() {
-
-        return ResponseEntity.ok(
-                equipoService.listarTodos()
-        );
+        return ResponseEntity.ok(equipoService.listarTodos());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Equipo> obtener(
-            @PathVariable Long id) {
-
-        return ResponseEntity.ok(
-                equipoService.obtenerId(id)
-        );
+    public ResponseEntity<Equipo> obtener(@PathVariable Long id) {
+        return ResponseEntity.ok(equipoService.obtenerId(id));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Equipo> actualizar(
-            @PathVariable Long id,
-            @RequestBody Equipo equipo) {
-
-        return ResponseEntity.ok(
-                equipoService.actualizar(id, equipo)
-        );
+    public ResponseEntity<Equipo> actualizar(@PathVariable Long id, @RequestBody Equipo equipo) {
+        return ResponseEntity.ok(equipoService.actualizar(id, equipo));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> eliminar(
-            @PathVariable Long id) {
-
+    public ResponseEntity<Void> eliminar(@PathVariable Long id) {
         equipoService.eliminar(id);
-
         return ResponseEntity.noContent().build();
     }
 }
