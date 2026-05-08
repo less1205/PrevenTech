@@ -2,7 +2,7 @@ package com.preventech.backend.entities;
 
 import java.util.List;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.preventech.backend.enums.Tipo;
 
 import jakarta.persistence.*;
@@ -28,11 +28,7 @@ public class Equipo {
     private String ubicacion;
     private String estado;
 
-    @JsonManagedReference("equipo-mantencion")
-    @OneToMany(
-        mappedBy = "equipo",
-        cascade = CascadeType.ALL,
-        orphanRemoval = true
-    )
+    @OneToMany(mappedBy = "equipo")
+    @JsonBackReference("equipo-mantencion")
     private List<Mantencion> mantenciones;
 }

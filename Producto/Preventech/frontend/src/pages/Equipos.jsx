@@ -1,13 +1,12 @@
 import { useEffect, useState } from "react";
 import "../styles/equipos.css";
+import { motion } from "framer-motion";
 
 function Equipos() {
 
   const [filtro, setFiltro] = useState("todos");
   const [busqueda, setBusqueda] = useState("");
-
   const [listaEquipos, setListaEquipos] = useState([]);
-
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -15,9 +14,7 @@ function Equipos() {
   }, []);
 
   const obtenerEquipos = async () => {
-
     try {
-
       const response = await fetch("http://localhost:8080/api/equipos");
 
       if (!response.ok) {
@@ -25,24 +22,17 @@ function Equipos() {
       }
 
       const data = await response.json();
-
       setListaEquipos(data);
 
     } catch (error) {
-
       console.error("Error cargando equipos:", error);
-
     } finally {
-
       setLoading(false);
-
     }
   };
 
   const eliminarEquipo = async (id) => {
-
     try {
-
       const response = await fetch(`http://localhost:8080/api/equipos/${id}`, {
         method: "DELETE"
       });
@@ -54,22 +44,22 @@ function Equipos() {
       obtenerEquipos();
 
     } catch (error) {
-
       console.error("Error eliminando equipo:", error);
-
     }
+  };
+
+  const badgeEstado = (estado) => {
+    if (estado === "AL_DIA") return <span className="estado verde">Al día</span>;
+    if (estado === "PROXIMO") return <span className="estado amarillo">Preventivo</span>;
+    if (estado === "VENCIDO") return <span className="estado rojo">Crítico</span>;
+    return <span className="estado">-</span>;
   };
 
   const equiposFiltrados = listaEquipos.filter((e) => {
 
     const coincideBusqueda =
-      (e.nombre || "")
-        .toLowerCase()
-        .includes(busqueda.toLowerCase()) ||
-
-      (e.tipo || "")
-        .toLowerCase()
-        .includes(busqueda.toLowerCase());
+      (e.nombre || "").toLowerCase().includes(busqueda.toLowerCase()) ||
+      (e.tipo || "").toLowerCase().includes(busqueda.toLowerCase());
 
     const estado = (e.estado || "").toLowerCase();
 
@@ -80,13 +70,21 @@ function Equipos() {
   });
 
   if (loading) {
-    return <h2>Cargando equipos...</h2>;
+    return <h2 className="loading">Cargando equipos...</h2>;
   }
 
   return (
-    <div className="equipos-container">
+    <motion.div
+      className="equipos-container"
+      initial={{ opacity: 0, x: 10 }}
+      animate={{ opacity: 1, x: 0 }}
+      exit={{ opacity: 0, x: -10 }}
+      transition={{ duration: 0.25 }}
+    >
 
-      <h1>Equipos</h1>
+      <div className="equipos-header">
+        <h1>Equipos</h1>
+      </div>
 
       <input
         type="text"
@@ -99,8 +97,8 @@ function Equipos() {
       <div className="filtros">
         <button onClick={() => setFiltro("todos")}>Todos</button>
         <button onClick={() => setFiltro("al_dia")}>🟢 Al día</button>
-        <button onClick={() => setFiltro("proximo")}>🟡 Próximos</button>
-        <button onClick={() => setFiltro("vencido")}>🔴 Vencidos</button>
+        <button onClick={() => setFiltro("proximo")}>🟡 Preventivo</button>
+        <button onClick={() => setFiltro("vencido")}>🔴 Crítico</button>
       </div>
 
       <table className="tabla">
@@ -118,26 +116,18 @@ function Equipos() {
         <tbody>
 
           {equiposFiltrados.length === 0 ? (
-
             <tr>
               <td colSpan="5">No hay equipos</td>
             </tr>
-
           ) : (
-
             equiposFiltrados.map((equipo) => (
-
               <tr key={equipo.id}>
 
                 <td>{equipo.nombre}</td>
                 <td>{equipo.tipo}</td>
                 <td>{equipo.ubicacion}</td>
 
-                <td>
-                  {equipo.estado === "VENCIDO" && "🔴 Vencido"}
-                  {equipo.estado === "PROXIMO" && "🟡 Próximo"}
-                  {equipo.estado === "AL_DIA" && "🟢 Al día"}
-                </td>
+                <td>{badgeEstado(equipo.estado)}</td>
 
                 <td>
                   <button
@@ -156,7 +146,7 @@ function Equipos() {
 
       </table>
 
-    </div>
+    </motion.div>
   );
 }
 

@@ -1,20 +1,35 @@
 .card {
   padding: 20px;
   border-radius: 16px;
+
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+
   height: 140px;
+
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+
+  border: 1px solid transparent;
+
+  transition: all 0.2s ease;
+}
+
+.card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
 }
 
 .card h3 {
   font-size: 14px;
   margin-bottom: 10px;
+  color: inherit;
 }
 
 .card p {
   font-size: 24px;
+  font-weight: 800;
+  margin: 0;
 }
 
 .cards-grid {
@@ -24,22 +39,28 @@
   margin-top: 20px;
 }
 
-
 .card-gris {
-  background: #dcdde1;
-  color: #2f3640;
+  background: #f5f3ff;
+  color: #6d28d9;
+  border-color: #ddd6fe;
 }
 
 .card-rojo {
-  background: #e84118;
+  background: #fff1f2;
+  color: #e11d48;
+  border-color: #fecdd3;
 }
 
 .card-naranja {
-  background: #fbc531;
+  background: #fffbeb;
+  color: #d97706;
+  border-color: #fde68a;
 }
 
 .card-verde {
-  background: #4cd137;
+  background: #ecfdf5;
+  color: #059669;
+  border-color: #a7f3d0;
 }
 
 .card-top {
@@ -52,19 +73,19 @@
   font-size: 12px;
   padding: 4px 8px;
   border-radius: 12px;
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.4);
 }
 
 .icon-placeholder {
   width: 30px;
   height: 30px;
   border-radius: 8px;
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.3);
 }
 
 .card-bottom .numero {
   font-size: 32px;
-  font-weight: 800;
+  font-weight: 900;
   margin-bottom: 5px;
   line-height: 1;
 }
@@ -72,5 +93,5 @@
 .card-bottom .titulo {
   font-size: 14px;
   font-weight: 500;
-  opacity: 0.9;
+  opacity: 0.85;
 }

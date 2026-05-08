@@ -1,0 +1,132 @@
+.reportes-container {
+  padding: 30px;
+  background: #f8fafc;
+  min-height: 100vh;
+  color: #334155;
+}
+
+.reportes-container h1 {
+  font-size: 28px;
+  font-weight: 700;
+  color: #0f172a;
+  margin-bottom: 20px;
+}
+
+.reportes-cards {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 25px;
+}
+
+.card {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 18px;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.06);
+  cursor: pointer;
+  transition: 0.2s;
+  border: 1px solid #e2e8f0;
+}
+
+.card:hover {
+  transform: translateY(-3px);
+}
+
+.card span {
+  font-size: 13px;
+  color: #64748b;
+}
+
+.card h2 {
+  font-size: 26px;
+  margin-top: 6px;
+  color: #0f172a;
+}
+
+.card.verde {
+  background: #ecfdf5;
+  border-color: #bbf7d0;
+}
+
+.card.amarillo {
+  background: #fffbeb;
+  border-color: #fde68a;
+}
+
+.card.rojo {
+  background: #fef2f2;
+  border-color: #fecaca;
+}
+
+.filtros {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.filtros input {
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  background: #ffffff;
+  color: #334155;
+}
+
+.filtros button {
+  padding: 10px 14px;
+  border-radius: 12px;
+  border: none;
+  cursor: pointer;
+  background: #8b5cf6;
+  color: white;
+  font-weight: 600;
+}
+
+.filtros button:hover {
+  background: #7c3aed;
+}
+
+.tabla {
+  width: 100%;
+  border-collapse: collapse;
+  background: #ffffff;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.06);
+}
+
+.tabla th {
+  background: #f5f3ff;
+  color: #6d28d9;
+  padding: 14px;
+  font-weight: 600;
+}
+
+.tabla td {
+  padding: 14px;
+  text-align: center;
+  color: #475569;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.estado-rojo {
+  color: #dc2626;
+  font-weight: 600;
+}
+
+.estado-amarillo {
+  color: #d97706;
+  font-weight: 600;
+}
+
+.estado-verde {
+  color: #16a34a;
+  font-weight: 600;
+}
+
+.tabla td[colspan] {
+  padding: 20px;
+  color: #94a3b8;
+}

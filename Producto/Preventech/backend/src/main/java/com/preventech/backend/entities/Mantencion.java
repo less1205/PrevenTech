@@ -21,27 +21,29 @@ public class Mantencion {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     private LocalDate fecha;
     private String detalle;
 
     @Column(name = "evidencia_url")
     private String evidenciaUrl;
+
     private LocalDate proximaFecha;
 
     @Enumerated(EnumType.STRING)
     private Estado estado;
 
-    @JsonBackReference("equipo-mantencion")
     @ManyToOne
     @JoinColumn(name = "equipo_id")
+    @JsonManagedReference("equipo-mantencion")
     private Equipo equipo;
 
-    @JsonBackReference("usuario-mantencion")
     @ManyToOne
     @JoinColumn(name = "usuario_id")
+    @JsonBackReference("usuario-mantencion")
     private Usuario usuario;
 
-    @JsonManagedReference("mantencion-alerta")
     @OneToOne(mappedBy = "mantencion", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference("mantencion-alerta")
     private Alerta alerta;
 }

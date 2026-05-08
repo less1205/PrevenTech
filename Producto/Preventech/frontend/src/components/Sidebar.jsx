@@ -8,7 +8,9 @@ function Sidebar() {
     <div className="sidebar">
 
       <div className="logo">
-        <div className="logo-icon"></div>
+        <div className="logo-icon">
+          🏢
+        </div>
         <div>
           <h2>PrevenTech</h2>
           <span>Gestión Integral</span>

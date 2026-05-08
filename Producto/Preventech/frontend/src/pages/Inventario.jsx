@@ -1,10 +1,80 @@
+import { useEffect, useState } from "react";
 import "../styles/inventario.css";
+import { motion } from "framer-motion";
 
 function Inventario() {
-  return (
-    <div className="inventario-container">
 
-      
+  const [equipos, setEquipos] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  const [filtroEstado, setFiltroEstado] = useState("todos");
+  const [filtroCategoria, setFiltroCategoria] = useState("todos");
+  const [filtroUbicacion, setFiltroUbicacion] = useState("todos");
+
+  useEffect(() => {
+    obtenerEquipos();
+  }, []);
+
+  const obtenerEquipos = async () => {
+    try {
+      const res = await fetch("http://localhost:8080/api/equipos");
+
+      if (!res.ok) {
+        throw new Error(`Error HTTP: ${res.status}`);
+      }
+
+      const data = await res.json();
+      setEquipos(data);
+
+    } catch (error) {
+      console.error("Error cargando inventario:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const equiposFiltrados = equipos.filter((e) => {
+
+    const estado = (e.estado || "").toLowerCase();
+    const categoria = (e.tipo || "").toLowerCase();
+    const ubicacion = (e.ubicacion || "").toLowerCase();
+
+    const cumpleEstado =
+      filtroEstado === "todos" || estado === filtroEstado;
+
+    const cumpleCategoria =
+      filtroCategoria === "todos" || categoria === filtroCategoria;
+
+    const cumpleUbicacion =
+      filtroUbicacion === "todos" || ubicacion === filtroUbicacion;
+
+    return cumpleEstado && cumpleCategoria && cumpleUbicacion;
+  });
+
+  const estadosUnicos = [...new Set(equipos.map(e => (e.estado || "").toLowerCase()))];
+  const categoriasUnicas = [...new Set(equipos.map(e => (e.tipo || "").toLowerCase()))];
+  const ubicacionesUnicas = [...new Set(equipos.map(e => (e.ubicacion || "").toLowerCase()))];
+
+  const badgeEstado = (estado) => {
+    if (estado === "AL_DIA") return <span className="estado verde">Al día</span>;
+    if (estado === "PROXIMO") return <span className="estado amarillo">Preventivo</span>;
+    if (estado === "VENCIDO") return <span className="estado rojo">Crítico</span>;
+    return <span className="estado">-</span>;
+  };
+
+  if (loading) {
+    return <h2>Cargando inventario...</h2>;
+  }
+
+  return (
+    <motion.div
+      className="inventario-container"
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -10 }}
+      transition={{ duration: 0.25 }}
+    >
+
       <div className="inventario-header">
         <div>
           <h1>Gestión de Inventario</h1>
@@ -16,24 +86,35 @@ function Inventario() {
         </button>
       </div>
 
-  
       <div className="filtros">
-        <select>
-          <option>Todas las Categorías</option>
+
+        <select value={filtroCategoria} onChange={(e) => setFiltroCategoria(e.target.value)}>
+          <option value="todos">Todas las Categorías</option>
+          {categoriasUnicas.map((c, i) => (
+            <option key={i} value={c}>{c}</option>
+          ))}
         </select>
 
-        <select>
-          <option>Todos los Estados</option>
+        <select value={filtroEstado} onChange={(e) => setFiltroEstado(e.target.value)}>
+          <option value="todos">Todos los Estados</option>
+          {estadosUnicos.map((e, i) => (
+            <option key={i} value={e}>{e}</option>
+          ))}
         </select>
 
-        <select>
-          <option>Todas las Ubicaciones</option>
+        <select value={filtroUbicacion} onChange={(e) => setFiltroUbicacion(e.target.value)}>
+          <option value="todos">Todas las Ubicaciones</option>
+          {ubicacionesUnicas.map((u, i) => (
+            <option key={i} value={u}>{u}</option>
+          ))}
         </select>
+
       </div>
 
-
       <div className="tabla-container">
+
         <table>
+
           <thead>
             <tr>
               <th>ID</th>
@@ -47,40 +128,38 @@ function Inventario() {
           </thead>
 
           <tbody>
-            <tr>
-              <td>#EQ-001</td>
-              <td>Bomba Hidroneumática #1</td>
-              <td>Bombas</td>
-              <td>Torre A - Sótano 1</td>
-              <td>15/01/2025</td>
-              <td><span className="estado verde">Al día</span></td>
-              <td>⋯</td>
-            </tr>
 
-            <tr>
-              <td>#EQ-002</td>
-              <td>Ascensor Principal</td>
-              <td>Ascensores</td>
-              <td>Torre B - Hall</td>
-              <td>24/12/2024</td>
-              <td><span className="estado amarillo">Preventivo</span></td>
-              <td>⋯</td>
-            </tr>
+            {equiposFiltrados.length === 0 ? (
+              <tr>
+                <td colSpan="7">No hay equipos</td>
+              </tr>
+            ) : (
 
-            <tr>
-              <td>#EQ-003</td>
-              <td>Bomba Hidroneumática #3</td>
-              <td>Bombas</td>
-              <td>Torre A - Sótano 2</td>
-              <td>10/01/2024</td>
-              <td><span className="estado rojo">Crítico</span></td>
-              <td>⋯</td>
-            </tr>
+              equiposFiltrados.map((e) => (
+                <tr key={e.id}>
+
+                  <td>#{e.id}</td>
+                  <td>{e.nombre}</td>
+                  <td>{e.tipo}</td>
+                  <td>{e.ubicacion}</td>
+                  <td>{e.ultimaMantencion || "-"}</td>
+
+                  <td>{badgeEstado(e.estado)}</td>
+
+                  <td>⋯</td>
+
+                </tr>
+              ))
+
+            )}
+
           </tbody>
+
         </table>
+
       </div>
 
-    </div>
+    </motion.div>
   );
 }
 

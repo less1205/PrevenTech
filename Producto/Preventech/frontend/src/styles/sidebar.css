@@ -1,94 +1,118 @@
 .sidebar {
-  width: 250px;
-  height: 100vh;
-  background: #1e2a78;
-  color: white;
+  width: 260px;
+  min-height: 100vh;
+  background: linear-gradient(180deg, #0f172a, #1e1b4b);
+  color: #e2e8f0;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  padding: 20px;
+  padding: 22px;
+  box-sizing: border-box;
+  border-right: 1px solid rgba(255, 255, 255, 0.06);
 }
 
 .logo {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
+  margin-bottom: 32px;
 }
 
 .logo-icon {
-  width: 40px;
-  height: 40px;
-  background: #3b82f6;
-  border-radius: 10px;
+  width: 42px;
+  height: 42px;
+  background: linear-gradient(135deg, #8b5cf6, #60a5fa);
+  border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
+  box-shadow: 0 10px 20px rgba(139, 92, 246, 0.25);
 }
 
 .logo h2 {
   margin: 0;
-  font-size: 16px;
+  font-size: 15px;
+  font-weight: 700;
+  color: #f8fafc;
 }
 
 .logo span {
   font-size: 12px;
   opacity: 0.7;
+  color: #94a3b8;
 }
 
-
 .menu {
-  margin-top: 30px;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 8px;
+  flex: 1;
 }
 
 .item {
-  padding: 12px;
-  border-radius: 10px;
+  padding: 11px 12px;
+  border-radius: 12px;
   text-decoration: none;
-  color: white;
+  color: #cbd5e1;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
   transition: 0.2s;
+  border: 1px solid transparent;
 }
 
 .item:hover {
-  background: rgba(255,255,255,0.1);
+  background: rgba(139, 92, 246, 0.12);
+  color: #ffffff;
+  transform: translateX(2px);
 }
 
 .item.active {
-  background: rgba(255,255,255,0.2);
-  border-left: 4px solid #60a5fa;
+  background: rgba(139, 92, 246, 0.18);
+  color: #ffffff;
+  border-left: 4px solid #8b5cf6;
+  padding-left: 8px;
 }
-
-
 
 .perfil {
   display: flex;
   align-items: center;
   gap: 10px;
-  background: rgba(255,255,255,0.1);
+  background: rgba(255, 255, 255, 0.06);
   padding: 12px;
-  border-radius: 12px;
+  border-radius: 14px;
   cursor: pointer;
+  margin-top: auto;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  transition: 0.2s;
+}
+
+.perfil:hover {
+  background: rgba(255, 255, 255, 0.1);
 }
 
 .avatar {
-  width: 40px;
-  height: 40px;
-  background: linear-gradient(45deg, #a78bfa, #60a5fa);
+  width: 42px;
+  height: 42px;
+  background: linear-gradient(135deg, #a78bfa, #60a5fa);
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-weight: bold;
+  font-weight: 700;
+  color: white;
+  box-shadow: 0 8px 18px rgba(96, 165, 250, 0.25);
 }
 
 .perfil p {
   margin: 0;
   font-size: 14px;
+  font-weight: 600;
+  color: #f1f5f9;
 }
 
 .perfil span {
   font-size: 12px;
   opacity: 0.7;
+  color: #94a3b8;
 }
