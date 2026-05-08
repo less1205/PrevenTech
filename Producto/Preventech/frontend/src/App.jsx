@@ -9,7 +9,6 @@ import Inventario from "./pages/Inventario";
 import Layout from "./components/Layout";
 
 
-
 function App() {
   return (
     <BrowserRouter>
