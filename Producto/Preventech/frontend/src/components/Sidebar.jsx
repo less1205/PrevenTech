@@ -76,7 +76,6 @@ function Sidebar() {
 
       <div
         className="perfil"
-        onClick={() => navigate("/perfil")}
       >
 
         <div className="avatar">

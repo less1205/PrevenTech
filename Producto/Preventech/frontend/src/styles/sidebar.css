@@ -87,10 +87,18 @@
   transition: 0.2s;
 }
 
-.perfil:hover {
-  background: rgba(255, 255, 255, 0.1);
+.perfil {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(255, 255, 255, 0.06);
+  padding: 12px;
+  border-radius: 14px;
+  cursor: default;
+  margin-top: auto;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  transition: 0.2s;
 }
-
 .avatar {
   width: 42px;
   height: 42px;
