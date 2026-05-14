@@ -7,6 +7,7 @@ import Mantenciones from "./pages/Mantenciones";
 import Usuarios from "./pages/Usuarios";
 import Inventario from "./pages/Inventario";
 import Layout from "./components/Layout";
+import Perfil from "./pages/Perfil";
 
 
 function App() {
@@ -22,9 +23,7 @@ function App() {
           <Route path="/mantenciones" element={<Mantenciones />} />
           <Route path="/usuarios" element={<Usuarios />} />
           <Route path="/inventario" element={<Inventario />} />
-          
-
-
+          <Route path="/perfil" element={<Perfil />} />
         </Route>
 
       </Routes>

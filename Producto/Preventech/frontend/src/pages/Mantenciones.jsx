@@ -14,9 +14,25 @@ function Mantenciones() {
   const [fechaFinFiltro, setFechaFinFiltro] = useState("");
 
   useEffect(() => {
-    fetch("http://localhost:8080/api/mantenciones")
-      .then(res => res.json())
-      .then(data => setMantenciones(data));
+
+    const token = localStorage.getItem("token");
+
+    fetch("http://localhost:8080/api/mantenciones", {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
+      .then(res => {
+
+        if (!res.ok) {
+          throw new Error(`HTTP ${res.status}`);
+        }
+
+        return res.json();
+      })
+      .then(data => setMantenciones(data))
+      .catch(err => console.error(err));
+
   }, []);
 
   const total = mantenciones.length;

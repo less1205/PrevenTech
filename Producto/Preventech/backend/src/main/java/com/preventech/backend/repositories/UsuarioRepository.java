@@ -1,10 +1,19 @@
 package com.preventech.backend.repositories;
 
-import org.springframework.data.repository.CrudRepository;
+import java.util.List;
 import java.util.Optional;
 
-import com.preventech.backend.entities.Usuario;
+import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface UsuarioRepository extends CrudRepository<Usuario, Long> { 
+import com.preventech.backend.entities.Usuario;
+import com.preventech.backend.enums.Rol;
+
+public interface UsuarioRepository
+        extends JpaRepository<Usuario, Long> {
+
     Optional<Usuario> findByEmail(String email);
+
+    boolean existsByEmail(String email);
+
+    List<Usuario> findByRol(Rol rol);
 }

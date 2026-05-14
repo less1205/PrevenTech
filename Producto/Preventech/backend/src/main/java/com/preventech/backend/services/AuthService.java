@@ -28,7 +28,10 @@ public class AuthService {
         );
 
         if (authentication.isAuthenticated()) {
-            return jwtService.generarToken(usuario.getEmail());
+            return jwtService.generarToken(
+                    usuario.getEmail(),
+                    usuario.getRol().name()
+            );
         }
 
         throw new RuntimeException("Credenciales inválidas");

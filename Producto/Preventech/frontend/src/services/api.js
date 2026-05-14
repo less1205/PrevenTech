@@ -1,8 +1,20 @@
 const API = "http://localhost:8080/api";
 
+const getHeaders = () => {
+
+  const token = localStorage.getItem("token");
+
+  return {
+    "Content-Type": "application/json",
+    "Authorization": `Bearer ${token}`
+  };
+};
+
 export const obtenerEquipos = async () => {
 
-  const response = await fetch(`${API}/equipos`);
+  const response = await fetch(`${API}/equipos`, {
+    headers: getHeaders()
+  });
 
   if (!response.ok) {
     throw new Error("Error obteniendo equipos");
@@ -13,7 +25,9 @@ export const obtenerEquipos = async () => {
 
 export const obtenerEquipoPorId = async (id) => {
 
-  const response = await fetch(`${API}/equipos/${id}`);
+  const response = await fetch(`${API}/equipos/${id}`, {
+    headers: getHeaders()
+  });
 
   if (!response.ok) {
     throw new Error("Error obteniendo equipo");
@@ -26,9 +40,7 @@ export const crearEquipo = async (equipo) => {
 
   const response = await fetch(`${API}/equipos`, {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
+    headers: getHeaders(),
     body: JSON.stringify(equipo),
   });
 
@@ -43,9 +55,7 @@ export const actualizarEquipo = async (id, equipo) => {
 
   const response = await fetch(`${API}/equipos/${id}`, {
     method: "PUT",
-    headers: {
-      "Content-Type": "application/json",
-    },
+    headers: getHeaders(),
     body: JSON.stringify(equipo),
   });
 
@@ -60,6 +70,7 @@ export const eliminarEquipo = async (id) => {
 
   const response = await fetch(`${API}/equipos/${id}`, {
     method: "DELETE",
+    headers: getHeaders()
   });
 
   if (!response.ok) {
@@ -71,7 +82,9 @@ export const eliminarEquipo = async (id) => {
 
 export const obtenerMantenciones = async () => {
 
-  const response = await fetch(`${API}/mantenciones`);
+  const response = await fetch(`${API}/mantenciones`, {
+    headers: getHeaders()
+  });
 
   if (!response.ok) {
     throw new Error("Error obteniendo mantenciones");
@@ -84,9 +97,7 @@ export const crearMantencion = async (mantencion) => {
 
   const response = await fetch(`${API}/mantenciones`, {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
+    headers: getHeaders(),
     body: JSON.stringify(mantencion),
   });
 
@@ -99,7 +110,9 @@ export const crearMantencion = async (mantencion) => {
 
 export const obtenerAlertas = async () => {
 
-  const response = await fetch(`${API}/alertas`);
+  const response = await fetch(`${API}/alertas`, {
+    headers: getHeaders()
+  });
 
   if (!response.ok) {
     throw new Error("Error obteniendo alertas");
@@ -110,7 +123,9 @@ export const obtenerAlertas = async () => {
 
 export const obtenerUsuarios = async () => {
 
-  const response = await fetch(`${API}/usuarios`);
+  const response = await fetch(`${API}/usuarios`, {
+    headers: getHeaders()
+  });
 
   if (!response.ok) {
     throw new Error("Error obteniendo usuarios");

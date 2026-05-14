@@ -10,9 +10,25 @@ function Dashboard() {
   const [equipos, setEquipos] = useState([]);
 
   useEffect(() => {
-    fetch("http://localhost:8080/api/equipos")
-      .then(res => res.json())
-      .then(data => setEquipos(data));
+
+    const token = localStorage.getItem("token");
+
+    fetch("http://localhost:8080/api/equipos", {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
+      .then(res => {
+
+        if (!res.ok) {
+          throw new Error(`HTTP ${res.status}`);
+        }
+
+        return res.json();
+      })
+      .then(data => setEquipos(data))
+      .catch(err => console.error(err));
+
   }, []);
 
   const total = equipos.length;

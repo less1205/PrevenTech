@@ -14,28 +14,50 @@ function Equipos() {
   }, []);
 
   const obtenerEquipos = async () => {
+
     try {
-      const response = await fetch("http://localhost:8080/api/equipos");
+
+      const token = localStorage.getItem("token");
+
+      const response = await fetch("http://localhost:8080/api/equipos", {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
 
       if (!response.ok) {
         throw new Error(`Error HTTP: ${response.status}`);
       }
 
       const data = await response.json();
+
       setListaEquipos(data);
 
     } catch (error) {
+
       console.error("Error cargando equipos:", error);
+
     } finally {
+
       setLoading(false);
     }
   };
 
   const eliminarEquipo = async (id) => {
+
     try {
-      const response = await fetch(`http://localhost:8080/api/equipos/${id}`, {
-        method: "DELETE"
-      });
+
+      const token = localStorage.getItem("token");
+
+      const response = await fetch(
+        `http://localhost:8080/api/equipos/${id}`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }
+      );
 
       if (!response.ok) {
         throw new Error(`Error HTTP: ${response.status}`);
@@ -44,22 +66,38 @@ function Equipos() {
       obtenerEquipos();
 
     } catch (error) {
+
       console.error("Error eliminando equipo:", error);
     }
   };
 
   const badgeEstado = (estado) => {
-    if (estado === "AL_DIA") return <span className="estado verde">Al día</span>;
-    if (estado === "PROXIMO") return <span className="estado amarillo">Preventivo</span>;
-    if (estado === "VENCIDO") return <span className="estado rojo">Crítico</span>;
+
+    if (estado === "AL_DIA") {
+      return <span className="estado verde">Al día</span>;
+    }
+
+    if (estado === "PROXIMO") {
+      return <span className="estado amarillo">Preventivo</span>;
+    }
+
+    if (estado === "VENCIDO") {
+      return <span className="estado rojo">Crítico</span>;
+    }
+
     return <span className="estado">-</span>;
   };
 
   const equiposFiltrados = listaEquipos.filter((e) => {
 
     const coincideBusqueda =
-      (e.nombre || "").toLowerCase().includes(busqueda.toLowerCase()) ||
-      (e.tipo || "").toLowerCase().includes(busqueda.toLowerCase());
+      (e.nombre || "")
+        .toLowerCase()
+        .includes(busqueda.toLowerCase()) ||
+
+      (e.tipo || "")
+        .toLowerCase()
+        .includes(busqueda.toLowerCase());
 
     const estado = (e.estado || "").toLowerCase();
 
@@ -95,10 +133,23 @@ function Equipos() {
       />
 
       <div className="filtros">
-        <button onClick={() => setFiltro("todos")}>Todos</button>
-        <button onClick={() => setFiltro("al_dia")}>🟢 Al día</button>
-        <button onClick={() => setFiltro("proximo")}>🟡 Preventivo</button>
-        <button onClick={() => setFiltro("vencido")}>🔴 Crítico</button>
+
+        <button onClick={() => setFiltro("todos")}>
+          Todos
+        </button>
+
+        <button onClick={() => setFiltro("al_dia")}>
+          🟢 Al día
+        </button>
+
+        <button onClick={() => setFiltro("proximo")}>
+          🟡 Preventivo
+        </button>
+
+        <button onClick={() => setFiltro("vencido")}>
+          🔴 Crítico
+        </button>
+
       </div>
 
       <table className="tabla">
@@ -116,30 +167,40 @@ function Equipos() {
         <tbody>
 
           {equiposFiltrados.length === 0 ? (
+
             <tr>
               <td colSpan="5">No hay equipos</td>
             </tr>
+
           ) : (
+
             equiposFiltrados.map((equipo) => (
+
               <tr key={equipo.id}>
 
                 <td>{equipo.nombre}</td>
+
                 <td>{equipo.tipo}</td>
+
                 <td>{equipo.ubicacion}</td>
 
                 <td>{badgeEstado(equipo.estado)}</td>
 
                 <td>
+
                   <button
                     className="eliminar"
                     onClick={() => eliminarEquipo(equipo.id)}
                   >
                     Eliminar
                   </button>
+
                 </td>
 
               </tr>
+
             ))
+
           )}
 
         </tbody>

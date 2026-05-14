@@ -23,12 +23,25 @@ public class JwtService {
         return Keys.hmacShaKeyFor(jwtProperties.getSecret().getBytes());
     }
 
-    public String generarToken(String email) {
+    public String generarToken(String email, String rol) {
+
         return Jwts.builder()
+
                 .setSubject(email)
+
+                .claim("rol", rol)
+
                 .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + jwtProperties.getExpiration()))
+
+                .setExpiration(
+                        new Date(
+                                System.currentTimeMillis()
+                                        + jwtProperties.getExpiration()
+                        )
+                )
+
                 .signWith(getKey())
+
                 .compact();
     }
 
