@@ -35,7 +35,7 @@ public class Mantencion {
 
     @ManyToOne
     @JoinColumn(name = "equipo_id")
-    @JsonManagedReference("equipo-mantencion")
+    @JsonBackReference("equipo-mantencion")
     private Equipo equipo;
 
     @ManyToOne

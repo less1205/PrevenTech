@@ -1,6 +1,7 @@
 package com.preventech.backend.controllers;
 
 import java.util.List;
+import jakarta.validation.Valid;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -22,8 +23,12 @@ public class UsuarioRestController {
 
     @PreAuthorize("hasAuthority('ROLE_ADMINISTRADOR')")
     @PostMapping
-    public ResponseEntity<Usuario> crear(@RequestBody Usuario usuario) {
-        return ResponseEntity.ok(usuarioService.crear(usuario));
+    public ResponseEntity<Usuario> crear(
+            @Valid @RequestBody Usuario usuario) {
+
+        return ResponseEntity.ok(
+            usuarioService.crear(usuario)
+        );
     }
 
     @PreAuthorize("hasAuthority('ROLE_ADMINISTRADOR')")
@@ -46,7 +51,7 @@ public class UsuarioRestController {
 
     @PreAuthorize("hasAuthority('ROLE_ADMINISTRADOR')")
     @PutMapping("/{id}")
-    public ResponseEntity<Usuario> actualizar(@PathVariable Long id, @RequestBody Usuario usuario) {
+    public ResponseEntity<Usuario> actualizar(@PathVariable Long id, @Valid @RequestBody Usuario usuario) {
         return ResponseEntity.ok(usuarioService.actualizar(id, usuario));
     }
 

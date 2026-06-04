@@ -1,6 +1,10 @@
 import { useEffect, useState } from "react";
 import "../styles/equipos.css";
 import { motion } from "framer-motion";
+import {
+  obtenerEquipos as obtenerEquiposApi,
+  eliminarEquipo as eliminarEquipoApi
+} from "../services/api";
 
 function Equipos() {
 
@@ -17,19 +21,7 @@ function Equipos() {
 
     try {
 
-      const token = localStorage.getItem("token");
-
-      const response = await fetch("http://localhost:8080/api/equipos", {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      });
-
-      if (!response.ok) {
-        throw new Error(`Error HTTP: ${response.status}`);
-      }
-
-      const data = await response.json();
+      const data = await obtenerEquiposApi();
 
       setListaEquipos(data);
 
@@ -47,21 +39,7 @@ function Equipos() {
 
     try {
 
-      const token = localStorage.getItem("token");
-
-      const response = await fetch(
-        `http://localhost:8080/api/equipos/${id}`,
-        {
-          method: "DELETE",
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error(`Error HTTP: ${response.status}`);
-      }
+      await eliminarEquipoApi(id);
 
       obtenerEquipos();
 
@@ -132,35 +110,41 @@ function Equipos() {
         className="buscador"
       />
 
-      <div className="filtros">
+    <div className="filtros">
 
-        <button onClick={() => setFiltro("todos")}>
-          Todos
-        </button>
+      <select
+        value={filtro}
+        onChange={(e) => setFiltro(e.target.value)}
+      >
+        <option value="todos">
+          Todos los Estados
+        </option>
 
-        <button onClick={() => setFiltro("al_dia")}>
+        <option value="al_dia">
           🟢 Al día
-        </button>
+        </option>
 
-        <button onClick={() => setFiltro("proximo")}>
+        <option value="proximo">
           🟡 Preventivo
-        </button>
+        </option>
 
-        <button onClick={() => setFiltro("vencido")}>
+        <option value="vencido">
           🔴 Crítico
-        </button>
+        </option>
 
-      </div>
+      </select>
+
+    </div>
 
       <table className="tabla">
 
         <thead>
           <tr>
-            <th>Nombre</th>
-            <th>Tipo</th>
-            <th>Ubicación</th>
-            <th>Estado</th>
-            <th>Acciones</th>
+            <th>NOMBRE</th>
+            <th>TIPO</th>
+            <th>UBICACIÓN</th>
+            <th>ESTADO</th>
+            <th>ACCIONES</th>
           </tr>
         </thead>
 

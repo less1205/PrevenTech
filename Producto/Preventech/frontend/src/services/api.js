@@ -41,7 +41,7 @@ export const crearEquipo = async (equipo) => {
   const response = await fetch(`${API}/equipos`, {
     method: "POST",
     headers: getHeaders(),
-    body: JSON.stringify(equipo),
+    body: JSON.stringify(equipo)
   });
 
   if (!response.ok) {
@@ -56,7 +56,7 @@ export const actualizarEquipo = async (id, equipo) => {
   const response = await fetch(`${API}/equipos/${id}`, {
     method: "PUT",
     headers: getHeaders(),
-    body: JSON.stringify(equipo),
+    body: JSON.stringify(equipo)
   });
 
   if (!response.ok) {
@@ -98,7 +98,7 @@ export const crearMantencion = async (mantencion) => {
   const response = await fetch(`${API}/mantenciones`, {
     method: "POST",
     headers: getHeaders(),
-    body: JSON.stringify(mantencion),
+    body: JSON.stringify(mantencion)
   });
 
   if (!response.ok) {
@@ -128,8 +128,52 @@ export const obtenerUsuarios = async () => {
   });
 
   if (!response.ok) {
-    throw new Error("Error obteniendo usuarios");
+
+    const errorText = await response.text();
+
+    throw new Error(
+      errorText || "Error obteniendo usuarios"
+    );
   }
 
   return await response.json();
+};
+
+export const crearUsuario = async (usuario) => {
+
+  const response = await fetch(`${API}/usuarios`, {
+    method: "POST",
+    headers: getHeaders(),
+    body: JSON.stringify(usuario)
+  });
+
+  if (!response.ok) {
+
+    const errorText = await response.text();
+
+    throw new Error(
+      errorText || "Error creando usuario"
+    );
+  }
+
+  return await response.json();
+};
+
+export const eliminarUsuario = async (id) => {
+
+  const response = await fetch(`${API}/usuarios/${id}`, {
+    method: "DELETE",
+    headers: getHeaders()
+  });
+
+  if (!response.ok) {
+
+    const errorText = await response.text();
+
+    throw new Error(
+      errorText || "Error eliminando usuario"
+    );
+  }
+
+  return true;
 };

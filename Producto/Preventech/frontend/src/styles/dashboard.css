@@ -31,6 +31,7 @@
   grid-template-columns: 2fr 1fr;
   gap: 20px;
   align-items: start;
+  margin-top: 20px;
 }
 
 .panel {
@@ -38,6 +39,10 @@
   border-radius: 16px;
   padding: 22px;
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.06);
+}
+
+.panel:first-child {
+  margin-top: 20px;
 }
 
 .panel:hover {
@@ -51,4 +56,8 @@
   font-weight: 600;
   color: #1e293b;
   margin-bottom: 12px;
+}
+
+.grafico-panel {
+  margin-top: 20px;
 }

@@ -2,8 +2,10 @@ import "../styles/mantenciones.css";
 import "../styles/card.css";
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
+import { obtenerMantenciones } from "../services/api";
 
 function Mantenciones() {
+
   const [mantenciones, setMantenciones] = useState([]);
   const [filtro, setFiltro] = useState("todos");
 
@@ -15,21 +17,7 @@ function Mantenciones() {
 
   useEffect(() => {
 
-    const token = localStorage.getItem("token");
-
-    fetch("http://localhost:8080/api/mantenciones", {
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
-    })
-      .then(res => {
-
-        if (!res.ok) {
-          throw new Error(`HTTP ${res.status}`);
-        }
-
-        return res.json();
-      })
+    obtenerMantenciones()
       .then(data => setMantenciones(data))
       .catch(err => console.error(err));
 
@@ -41,6 +29,7 @@ function Mantenciones() {
   const alDia = mantenciones.filter(m => m.estado === "AL_DIA").length;
 
   const filtrados = mantenciones.filter(m => {
+
     const cumpleEstado =
       filtro === "todos" || m.estado === filtro;
 
@@ -56,9 +45,19 @@ function Mantenciones() {
   });
 
   const badgeEstado = (estado) => {
-    if (estado === "AL_DIA") return <span className="estado verde">Al día</span>;
-    if (estado === "PROXIMO") return <span className="estado amarillo">Preventivo</span>;
-    if (estado === "VENCIDO") return <span className="estado rojo">Crítico</span>;
+
+    if (estado === "AL_DIA") {
+      return <span className="estado verde">Al día</span>;
+    }
+
+    if (estado === "PROXIMO") {
+      return <span className="estado amarillo">Preventivo</span>;
+    }
+
+    if (estado === "VENCIDO") {
+      return <span className="estado rojo">Crítico</span>;
+    }
+
     return <span className="estado">-</span>;
   };
 
@@ -129,11 +128,11 @@ function Mantenciones() {
       <table className="tabla">
         <thead>
           <tr>
-            <th>Equipo</th>
-            <th>Fecha</th>
-            <th>Tipo</th>
-            <th>Estado</th>
-            <th>Próxima</th>
+            <th>EQUIPO</th>
+            <th>FECHA</th>
+            <th>TIPO</th>
+            <th>ESTADO</th>
+            <th>PRÓXIMA</th>
           </tr>
         </thead>
 

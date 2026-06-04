@@ -18,6 +18,15 @@ function Sidebar() {
     .slice(0, 2)
     .toUpperCase();
 
+  const cerrarSesion = () => {
+
+    localStorage.removeItem("token");
+    localStorage.removeItem("nombre");
+    localStorage.removeItem("rol");
+
+    navigate("/");
+  };
+
   return (
 
     <div className="sidebar">
@@ -51,12 +60,14 @@ function Sidebar() {
           📦 Inventario
         </NavLink>
 
-        <NavLink
-          to="/usuarios"
-          className="item"
-        >
-          👥 Usuarios
-        </NavLink>
+        {rol?.includes("ADMINISTRADOR") && (
+          <NavLink
+            to="/usuarios"
+            className="item"
+          >
+            👥 Usuarios
+          </NavLink>
+        )}
 
         <NavLink
           to="/equipos"
@@ -74,9 +85,7 @@ function Sidebar() {
 
       </nav>
 
-      <div
-        className="perfil"
-      >
+      <div className="perfil">
 
         <div className="avatar">
           {iniciales}
@@ -93,6 +102,13 @@ function Sidebar() {
         </div>
 
       </div>
+
+      <button
+        className="btn-logout"
+        onClick={cerrarSesion}
+      >
+       Cerrar sesión
+      </button>
 
     </div>
   );

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import "../styles/inventario.css";
 import { motion } from "framer-motion";
+import { obtenerEquipos } from "../services/api";
 
 function Inventario() {
 
@@ -12,26 +13,14 @@ function Inventario() {
   const [filtroUbicacion, setFiltroUbicacion] = useState("todos");
 
   useEffect(() => {
-    obtenerEquipos();
+    obtenerEquiposInventario();
   }, []);
 
-  const obtenerEquipos = async () => {
+  const obtenerEquiposInventario = async () => {
 
     try {
 
-      const token = localStorage.getItem("token");
-
-      const res = await fetch("http://localhost:8080/api/equipos", {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      });
-
-      if (!res.ok) {
-        throw new Error(`Error HTTP: ${res.status}`);
-      }
-
-      const data = await res.json();
+      const data = await obtenerEquipos();
 
       setEquipos(data);
 
@@ -196,12 +185,12 @@ function Inventario() {
 
             <tr>
               <th>ID</th>
-              <th>Nombre del Equipo</th>
-              <th>Categoría</th>
-              <th>Ubicación</th>
-              <th>Última Mantención</th>
-              <th>Estado</th>
-              <th>Acciones</th>
+              <th>NOMBRE DEL EQUIPO</th>
+              <th>CATEGORÍA</th>
+              <th>UBICACIÓN</th>
+              <th>ÚLTIMA MANTENCIÓN</th>
+              <th>ESTADO</th>
+              <th>ACCIONES</th>
             </tr>
 
           </thead>

@@ -124,3 +124,32 @@
   opacity: 0.7;
   color: #94a3b8;
 }
+
+.btn-logout {
+  margin-top: 12px;
+  width: 100%;
+  padding: 11px 12px;
+
+  border: 1px solid rgba(239, 68, 68, 0.25);
+  border-radius: 12px;
+
+  background: rgba(239, 68, 68, 0.08);
+  color: #fca5a5;
+
+  font-size: 14px;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition: all 0.2s ease;
+}
+
+.btn-logout:hover {
+  background: rgba(239, 68, 68, 0.16);
+  color: #ffffff;
+  transform: translateY(-1px);
+}
+
+.btn-logout:active {
+  transform: translateY(0);
+}

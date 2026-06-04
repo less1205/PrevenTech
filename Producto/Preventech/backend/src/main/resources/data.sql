@@ -6,11 +6,11 @@ USE base;
 
 INSERT INTO usuario (nombre, email, password, rol)
 VALUES
-('Carlos Mendoza','carlos.mendoza@preventech.com','$2a$10$NHvJP6MKws7EtATSIWYLveB6gJ5/.CEhG9pFxndYsFtcYzobwCzdu','TECNICO'),
-('María González','maria.gonzalez@preventech.com','$2a$10$NHvJP6MKws7EtATSIWYLveB6gJ5/.CEhG9pFxndYsFtcYzobwCzdu','SUPERVISOR'),
-('Maira Vidal','maira.vidal@preventech.com','$2a$10$NHvJP6MKws7EtATSIWYLveB6gJ5/.CEhG9pFxndYsFtcYzobwCzdu','ADMINISTRADOR'),
-('Lesly Díaz','lesly.diaz@preventech.com','$2a$10$NHvJP6MKws7EtATSIWYLveB6gJ5/.CEhG9pFxndYsFtcYzobwCzdu','ADMINISTRADOR'),
-('Ruth Gonzalez','ruth.gonzalez@preventech.com','$2a$10$NHvJP6MKws7EtATSIWYLveB6gJ5/.CEhG9pFxndYsFtcYzobwCzdu','ADMINISTRADOR');
+('Carlos Mendoza','carlos.mendoza@gmail.com','$2a$10$NHvJP6MKws7EtATSIWYLveB6gJ5/.CEhG9pFxndYsFtcYzobwCzdu','TECNICO'),
+('María González','maria.gonzalez@gmail.com','$2a$10$NHvJP6MKws7EtATSIWYLveB6gJ5/.CEhG9pFxndYsFtcYzobwCzdu','SUPERVISOR'),
+('Maira Vidal','maira.vidal@gmail.com','$2a$10$NHvJP6MKws7EtATSIWYLveB6gJ5/.CEhG9pFxndYsFtcYzobwCzdu','ADMINISTRADOR'),
+('Lesly Díaz','lesly.diaz@gmail.com','$2a$10$NHvJP6MKws7EtATSIWYLveB6gJ5/.CEhG9pFxndYsFtcYzobwCzdu','ADMINISTRADOR'),
+('Ruth Gonzalez','ruth.gonzalez@gmail.com','$2a$10$NHvJP6MKws7EtATSIWYLveB6gJ5/.CEhG9pFxndYsFtcYzobwCzdu','ADMINISTRADOR');
 
 -- =====================================================
 -- EQUIPOS

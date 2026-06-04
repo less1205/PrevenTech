@@ -4,60 +4,39 @@ import Card from "../components/Card";
 import Grafico from "../components/Grafico";
 import Alertas from "../components/Alertas";
 import { motion } from "framer-motion";
+import { obtenerEquipos } from "../services/api";
 
 function Dashboard() {
-
   const [equipos, setEquipos] = useState([]);
 
   useEffect(() => {
-
-    const token = localStorage.getItem("token");
-
-    fetch("http://localhost:8080/api/equipos", {
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
-    })
-      .then(res => {
-
-        if (!res.ok) {
-          throw new Error(`HTTP ${res.status}`);
-        }
-
-        return res.json();
-      })
-      .then(data => setEquipos(data))
-      .catch(err => console.error(err));
-
+    obtenerEquipos()
+      .then((data) => setEquipos(data))
+      .catch((err) => console.error(err));
   }, []);
 
   const total = equipos.length;
-  const criticos = equipos.filter(e => e.estado === "VENCIDO").length;
-  const preventivos = equipos.filter(e => e.estado === "PROXIMO").length;
-  const alDia = equipos.filter(e => e.estado === "AL_DIA").length;
+  const criticos = equipos.filter((e) => e.estado === "VENCIDO").length;
+  const preventivos = equipos.filter((e) => e.estado === "PROXIMO").length;
+  const alDia = equipos.filter((e) => e.estado === "AL_DIA").length;
 
   const pieData = [
     { name: "Al día", value: alDia },
     { name: "Próximo", value: preventivos },
-    { name: "Vencido", value: criticos }
+    { name: "Vencido", value: criticos },
   ];
 
   return (
     <div className="dashboard-container">
-
       <motion.div
-      initial={{ opacity: 0, y: 12 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -12 }}
-      transition={{ duration: 0.22 }}
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: -12 }}
+        transition={{ duration: 0.22 }}
       >
-
-        <h1 className="dashboard-title">
-          Panel de Control
-        </h1>
+        <h1 className="dashboard-title">Panel de Control</h1>
 
         <div className="cards-grid">
-
           <Card
             titulo="Total Equipos"
             numero={total}
@@ -89,23 +68,18 @@ function Dashboard() {
             badge="Al día"
             icono="✅"
           />
-
         </div>
 
         <div className="dashboard-bottom">
-
-          <div className="panel">
+          <div className="panel grafico-panel">
             <Grafico data={pieData} />
           </div>
 
           <div className="panel">
             <Alertas />
           </div>
-
         </div>
-
       </motion.div>
-
     </div>
   );
 }

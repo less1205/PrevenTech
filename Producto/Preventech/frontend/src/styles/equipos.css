@@ -76,14 +76,47 @@
 }
 
 .eliminar {
-  background: #fee2e2;
-  color: #b91c1c;
+  background: #ef4444;
+  color: white;
   border: none;
-  padding: 6px 12px;
+  padding: 8px 14px;
   border-radius: 10px;
   cursor: pointer;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.eliminar:hover {
+  background: #dc2626;
+  transform: translateY(-1px);
+}
+
+.eliminar:active {
+  transform: scale(0.97);
 }
 
 tbody tr:hover {
   background: #f8fafc;
+}
+
+.filtros {
+  margin: 20px 0;
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.filtros select {
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  background: #ffffff;
+  color: #334155;
+  outline: none;
+  transition: 0.2s;
+}
+
+.filtros select:focus {
+  border-color: #8b5cf6;
+  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.15);
 }

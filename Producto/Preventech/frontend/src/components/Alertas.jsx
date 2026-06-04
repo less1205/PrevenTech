@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import "../styles/alertas.css";
+import { obtenerAlertas } from "../services/api";
 
 function Alertas() {
 
@@ -7,21 +8,7 @@ function Alertas() {
 
   useEffect(() => {
 
-    const token = localStorage.getItem("token");
-
-    fetch("http://localhost:8080/api/alertas", {
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
-    })
-      .then(res => {
-
-        if (!res.ok) {
-          throw new Error(`Error HTTP: ${res.status}`);
-        }
-
-        return res.json();
-      })
+    obtenerAlertas()
       .then(data => setAlertas(data))
       .catch(error => {
         console.error("Error cargando alertas:", error);
@@ -49,9 +36,7 @@ function Alertas() {
 
             <p>{a.mensaje}</p>
 
-            <span>
-              {a.tiempo || "Reciente"}
-            </span>
+            <span>Reciente</span>
 
           </div>
 

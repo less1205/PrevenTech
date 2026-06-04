@@ -2,6 +2,12 @@ import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import "../styles/usuarios.css";
 
+import {
+  obtenerUsuarios as obtenerUsuariosApi,
+  crearUsuario as crearUsuarioApi,
+  eliminarUsuario as eliminarUsuarioApi
+} from "../services/api";
+
 function Usuarios() {
 
   const [usuarios, setUsuarios] = useState([]);
@@ -12,10 +18,14 @@ function Usuarios() {
   const [password, setPassword] = useState("");
   const [rol, setRol] = useState("TECNICO");
 
-  const token = localStorage.getItem("token");
-  const rolUsuario = localStorage.getItem("rol");
+  const [mostrarModalEliminar, setMostrarModalEliminar] = useState(false);
+  const [usuarioAEliminar, setUsuarioAEliminar] = useState(null);
+  const [textoConfirmacion, setTextoConfirmacion] = useState("");
 
-  console.log("ROL:", rolUsuario);
+  const [mostrarError, setMostrarError] = useState(false);
+  const [mensajeError, setMensajeError] = useState("");
+
+  const rolUsuario = localStorage.getItem("rol");
 
   useEffect(() => {
 
@@ -28,33 +38,24 @@ function Usuarios() {
 
   }, []);
 
+  const mostrarAlertaError = (mensaje) => {
+
+    setMensajeError(
+      mensaje || "Ha ocurrido un error"
+    );
+
+    setMostrarError(true);
+
+    setTimeout(() => {
+      setMostrarError(false);
+    }, 4000);
+  };
+
   const obtenerUsuarios = async () => {
 
     try {
 
-      const res = await fetch(
-        "http://localhost:8080/api/usuarios",
-        {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        }
-      );
-
-      console.log("GET STATUS:", res.status);
-
-      if (!res.ok) {
-
-        const errorText = await res.text();
-
-        console.log("ERROR GET:", errorText);
-
-        throw new Error(
-          `HTTP ${res.status} - ${errorText}`
-        );
-      }
-
-      const data = await res.json();
+      const data = await obtenerUsuariosApi();
 
       setUsuarios(data);
 
@@ -65,6 +66,10 @@ function Usuarios() {
         error
       );
 
+      mostrarAlertaError(
+        error?.message
+      );
+
     } finally {
 
       setLoading(false);
@@ -73,46 +78,95 @@ function Usuarios() {
 
   const crearUsuario = async () => {
 
-    try {
+    if (!nombre.trim()) {
 
-      const res = await fetch(
-        "http://localhost:8080/api/usuarios",
-        {
-          method: "POST",
-
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`
-          },
-
-          body: JSON.stringify({
-            nombre,
-            email,
-            password,
-            rol
-          })
-        }
+      mostrarAlertaError(
+        "Debe ingresar un nombre"
       );
 
-      console.log("POST STATUS:", res.status);
+      return;
+    }
 
-      if (!res.ok) {
+    if (!email.trim()) {
 
-        const errorText = await res.text();
+      mostrarAlertaError(
+        "Debe ingresar un correo electrónico"
+      );
 
-        console.log(
-          "ERROR BACKEND:",
-          errorText
-        );
+      return;
+    }
 
-        throw new Error(
-          `HTTP ${res.status} - ${errorText}`
-        );
-      }
+    if (!email.toLowerCase().endsWith("@gmail.com")) {
 
-      const data = await res.json();
+      mostrarAlertaError(
+        "El correo debe ser una dirección @gmail.com"
+      );
 
-      console.log("USUARIO CREADO:", data);
+      return;
+    }
+
+    if (!password.trim()) {
+
+      mostrarAlertaError(
+        "Debe ingresar una contraseña"
+      );
+
+      return;
+    }
+
+    if (password.length < 8) {
+
+      mostrarAlertaError(
+        "La contraseña debe tener al menos 8 caracteres"
+      );
+
+      return;
+    }
+
+    if (!/[A-Z]/.test(password)) {
+
+      mostrarAlertaError(
+        "La contraseña debe contener al menos una letra mayúscula"
+      );
+
+      return;
+    }
+
+    if (!/[a-z]/.test(password)) {
+
+      mostrarAlertaError(
+        "La contraseña debe contener al menos una letra minúscula"
+      );
+
+      return;
+    }
+
+    if (!/[0-9]/.test(password)) {
+
+      mostrarAlertaError(
+        "La contraseña debe contener al menos un número"
+      );
+
+      return;
+    }
+
+    if (!/[!@#$%^&*(),.?":{}|<>]/.test(password)) {
+
+      mostrarAlertaError(
+        "La contraseña debe contener al menos un carácter especial"
+      );
+
+      return;
+    }
+
+    try {
+
+      await crearUsuarioApi({
+        nombre,
+        email,
+        password,
+        rol
+      });
 
       setNombre("");
       setEmail("");
@@ -121,16 +175,64 @@ function Usuarios() {
 
       await obtenerUsuarios();
 
-      alert("Usuario creado correctamente");
+    } catch (error) {
+
+      const mensaje =
+        error?.message ||
+        "Error al crear usuario";
+
+      if (
+        mensaje.toLowerCase().includes("gmail")
+      ) {
+
+        mostrarAlertaError(
+          "El correo debe ser una dirección @gmail.com"
+        );
+
+      } else if (
+        mensaje.toLowerCase().includes("password") ||
+        mensaje.toLowerCase().includes("contraseña")
+      ) {
+
+        mostrarAlertaError(
+          "La contraseña no cumple los requisitos de seguridad"
+        );
+
+      } else {
+
+        mostrarAlertaError(mensaje);
+      }
+    }
+  };
+
+  const eliminarUsuario = async () => {
+
+    if (textoConfirmacion.trim() !== "ELIMINAR") {
+
+      mostrarAlertaError(
+        "Debe escribir ELIMINAR para continuar"
+      );
+
+      return;
+    }
+
+    try {
+
+      await eliminarUsuarioApi(
+        usuarioAEliminar.id
+      );
+
+      await obtenerUsuarios();
+
+      setMostrarModalEliminar(false);
+      setUsuarioAEliminar(null);
+      setTextoConfirmacion("");
 
     } catch (error) {
 
-      console.error(
-        "Error creando usuario:",
-        error
+      mostrarAlertaError(
+        error?.message
       );
-
-      alert(error.message);
     }
   };
 
@@ -152,6 +254,12 @@ function Usuarios() {
       transition={{ duration: 0.22 }}
     >
 
+      {mostrarError && (
+        <div className="alerta-error">
+          {mensajeError}
+        </div>
+      )}
+
       <div className="usuarios-header">
 
         <div>
@@ -165,6 +273,13 @@ function Usuarios() {
           </p>
 
         </div>
+
+                <button
+          className="btn-agregar"
+          onClick={crearUsuario}
+        >
+          + Agregar Usuario
+        </button>
 
       </div>
 
@@ -218,13 +333,6 @@ function Usuarios() {
 
         </select>
 
-        <button
-          className="btn-agregar"
-          onClick={crearUsuario}
-        >
-          + Agregar Usuario
-        </button>
-
       </div>
 
       <div className="tabla-container">
@@ -237,6 +345,7 @@ function Usuarios() {
               <th>USUARIO</th>
               <th>EMAIL</th>
               <th>ROL</th>
+              <th>ACCIONES</th>
             </tr>
 
           </thead>
@@ -246,7 +355,7 @@ function Usuarios() {
             {usuarios.length === 0 ? (
 
               <tr>
-                <td colSpan="3">
+                <td colSpan="4">
                   No hay usuarios
                 </td>
               </tr>
@@ -292,6 +401,21 @@ function Usuarios() {
 
                   </td>
 
+                  <td>
+
+                    <button
+                      className="btn-eliminar"
+                      onClick={() => {
+                        setUsuarioAEliminar(u);
+                        setTextoConfirmacion("");
+                        setMostrarModalEliminar(true);
+                      }}
+                    >
+                      Eliminar
+                    </button>
+
+                  </td>
+
                 </tr>
 
               ))
@@ -303,6 +427,70 @@ function Usuarios() {
         </table>
 
       </div>
+
+      {mostrarModalEliminar && (
+
+        <div className="modal-overlay">
+
+          <div className="modal-eliminar">
+
+            <h2>
+              Eliminar Usuario
+            </h2>
+
+            <p>
+              Está a punto de eliminar el siguiente usuario:
+            </p>
+
+            <strong>
+              {usuarioAEliminar?.nombre}
+            </strong>
+
+            <p className="texto-warning">
+              Esta acción es permanente y no se puede deshacer.
+            </p>
+
+            <p>
+              Para continuar escriba:
+              <strong> ELIMINAR </strong>
+            </p>
+
+            <input
+              type="text"
+              placeholder="Escriba ELIMINAR"
+              value={textoConfirmacion}
+              onChange={(e) =>
+                setTextoConfirmacion(e.target.value)
+              }
+            />
+
+            <div className="modal-botones">
+
+              <button
+                className="btn-cancelar"
+                onClick={() => {
+                  setMostrarModalEliminar(false);
+                  setUsuarioAEliminar(null);
+                  setTextoConfirmacion("");
+                }}
+              >
+                Cancelar
+              </button>
+
+              <button
+                className="btn-confirmar-eliminar"
+                onClick={eliminarUsuario}
+              >
+                Eliminar Usuario
+              </button>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      )}
 
     </motion.div>
   );
