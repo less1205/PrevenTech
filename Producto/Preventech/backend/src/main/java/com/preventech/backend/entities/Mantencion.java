@@ -1,11 +1,9 @@
 package com.preventech.backend.entities;
 
 import java.time.LocalDate;
-
-import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.preventech.backend.enums.Estado;
-
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -14,7 +12,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
-
 @Entity
 public class Mantencion {
 
@@ -35,12 +32,12 @@ public class Mantencion {
 
     @ManyToOne
     @JoinColumn(name = "equipo_id")
-    @JsonBackReference("equipo-mantencion")
+    @JsonIgnoreProperties("mantenciones")
     private Equipo equipo;
 
     @ManyToOne
     @JoinColumn(name = "usuario_id")
-    @JsonBackReference("usuario-mantencion")
+    @JsonIgnoreProperties("mantenciones") // CORREGIDO: Cambiado de JsonBackReference a JsonIgnoreProperties
     private Usuario usuario;
 
     @OneToOne(mappedBy = "mantencion", cascade = CascadeType.ALL, orphanRemoval = true)

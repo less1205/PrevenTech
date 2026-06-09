@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import "../styles/equipos.css";
-import { motion } from "framer-motion";
+import { motion } from "framer-motion"; 
 import {
   obtenerEquipos as obtenerEquiposApi,
   eliminarEquipo as eliminarEquipoApi
@@ -18,39 +18,35 @@ function Equipos() {
   }, []);
 
   const obtenerEquipos = async () => {
-
     try {
-
       const data = await obtenerEquiposApi();
-
       setListaEquipos(data);
-
     } catch (error) {
-
       console.error("Error cargando equipos:", error);
-
     } finally {
-
       setLoading(false);
     }
   };
 
+  // FUNCIÓN MODIFICADA: Ahora incluye confirmación previa y avisos visuales
   const eliminarEquipo = async (id) => {
+    const confirmar = window.confirm(
+      "¿Estás seguro de que deseas eliminar este equipo? Se borrará también todo su historial de mantenciones de forma permanente."
+    );
+
+    if (!confirmar) return;
 
     try {
-
       await eliminarEquipoApi(id);
-
-      obtenerEquipos();
-
+      alert("¡Equipo eliminado exitosamente!");
+      obtenerEquipos(); // Recarga la tabla de inmediato
     } catch (error) {
-
       console.error("Error eliminando equipo:", error);
+      alert("Ocurrió un error al intentar eliminar el equipo. Revisa la consola.");
     }
   };
 
   const badgeEstado = (estado) => {
-
     if (estado === "AL_DIA") {
       return <span className="estado verde">Al día</span>;
     }
@@ -67,20 +63,17 @@ function Equipos() {
   };
 
   const equiposFiltrados = listaEquipos.filter((e) => {
-
     const coincideBusqueda =
       (e.nombre || "")
         .toLowerCase()
         .includes(busqueda.toLowerCase()) ||
-
       (e.tipo || "")
         .toLowerCase()
         .includes(busqueda.toLowerCase());
 
-    const estado = (e.estado || "").toLowerCase();
-
-    const coincideFiltro =
-      filtro === "todos" || estado === filtro;
+    
+    const estado = (e.estado || "").toUpperCase();
+    const coincideFiltro = filtro === "todos" || estado === filtro;
 
     return coincideBusqueda && coincideFiltro;
   });
@@ -110,34 +103,20 @@ function Equipos() {
         className="buscador"
       />
 
-    <div className="filtros">
-
-      <select
-        value={filtro}
-        onChange={(e) => setFiltro(e.target.value)}
-      >
-        <option value="todos">
-          Todos los Estados
-        </option>
-
-        <option value="al_dia">
-          🟢 Al día
-        </option>
-
-        <option value="proximo">
-          🟡 Preventivo
-        </option>
-
-        <option value="vencido">
-          🔴 Crítico
-        </option>
-
-      </select>
-
-    </div>
+      <div className="filtros">
+        
+        <select
+          value={filtro}
+          onChange={(e) => setFiltro(e.target.value)}
+        >
+          <option value="todos">Todos los Estados</option>
+          <option value="AL_DIA">🟢 Al día</option>
+          <option value="PROXIMO">🟡 Preventivo</option>
+          <option value="VENCIDO">🔴 Crítico</option>
+        </select>
+      </div>
 
       <table className="tabla">
-
         <thead>
           <tr>
             <th>NOMBRE</th>
@@ -149,46 +128,29 @@ function Equipos() {
         </thead>
 
         <tbody>
-
           {equiposFiltrados.length === 0 ? (
-
             <tr>
               <td colSpan="5">No hay equipos</td>
             </tr>
-
           ) : (
-
             equiposFiltrados.map((equipo) => (
-
               <tr key={equipo.id}>
-
                 <td>{equipo.nombre}</td>
-
                 <td>{equipo.tipo}</td>
-
                 <td>{equipo.ubicacion}</td>
-
                 <td>{badgeEstado(equipo.estado)}</td>
-
                 <td>
-
                   <button
                     className="eliminar"
                     onClick={() => eliminarEquipo(equipo.id)}
                   >
                     Eliminar
                   </button>
-
                 </td>
-
               </tr>
-
             ))
-
           )}
-
         </tbody>
-
       </table>
 
     </motion.div>

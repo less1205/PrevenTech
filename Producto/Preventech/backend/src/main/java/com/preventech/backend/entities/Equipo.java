@@ -1,7 +1,6 @@
 package com.preventech.backend.entities;
 
 import java.util.List;
-
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.preventech.backend.enums.Tipo;
 
@@ -14,7 +13,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
-
 @Entity
 public class Equipo {
 
@@ -28,7 +26,8 @@ public class Equipo {
     private String ubicacion;
     private String estado;
 
-    @OneToMany(mappedBy = "equipo")
+    
+    @OneToMany(mappedBy = "equipo", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference("equipo-mantencion")
     private List<Mantencion> mantenciones;
 }

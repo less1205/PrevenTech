@@ -1,16 +1,13 @@
 package com.preventech.backend.security;
 
 import java.util.Date;
-
 import javax.crypto.SecretKey;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import com.preventech.backend.webconfig.JwtProperties;
-
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 
 @Service
@@ -19,29 +16,21 @@ public class JwtService {
     @Autowired
     private JwtProperties jwtProperties;
 
+    
     private SecretKey getKey() {
-        return Keys.hmacShaKeyFor(jwtProperties.getSecret().getBytes());
+        byte[] keyBytes = Decoders.BASE64.decode(jwtProperties.getSecret());
+        return Keys.hmacShaKeyFor(keyBytes);
     }
 
     public String generarToken(String email, String rol) {
-
         return Jwts.builder()
-
                 .setSubject(email)
-
                 .claim("rol", rol)
-
                 .setIssuedAt(new Date())
-
                 .setExpiration(
-                        new Date(
-                                System.currentTimeMillis()
-                                        + jwtProperties.getExpiration()
-                        )
+                        new Date(System.currentTimeMillis() + jwtProperties.getExpiration())
                 )
-
                 .signWith(getKey())
-
                 .compact();
     }
 
