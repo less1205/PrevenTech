@@ -13,9 +13,22 @@ function Equipos() {
   const [listaEquipos, setListaEquipos] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  const [mostrarModalEliminar, setMostrarModalEliminar] = useState(false);
+  const [equipoAEliminar, setEquipoAEliminar] = useState(null);
+  const [textoConfirmacion, setTextoConfirmacion] = useState("");
+
+  const [mostrarError, setMostrarError] = useState(false);
+  const [mensajeError, setMensajeError] = useState("");
+
   useEffect(() => {
     obtenerEquipos();
   }, []);
+
+  const mostrarAlertaError = (mensaje) => {
+    setMensajeError(mensaje || "Ha ocurrido un error");
+    setMostrarError(true);
+    setTimeout(() => setMostrarError(false), 4000);
+  };
 
   const obtenerEquipos = async () => {
     try {
@@ -23,64 +36,57 @@ function Equipos() {
       setListaEquipos(data);
     } catch (error) {
       console.error("Error cargando equipos:", error);
+      mostrarAlertaError(error?.message);
     } finally {
       setLoading(false);
     }
   };
 
-  // FUNCIÓN MODIFICADA: Ahora incluye confirmación previa y avisos visuales
-  const eliminarEquipo = async (id) => {
-    const confirmar = window.confirm(
-      "¿Estás seguro de que deseas eliminar este equipo? Se borrará también todo su historial de mantenciones de forma permanente."
-    );
+  const abrirModalEliminar = (equipo) => {
+    setEquipoAEliminar(equipo);
+    setTextoConfirmacion("");
+    setMostrarModalEliminar(true);
+  };
 
-    if (!confirmar) return;
+  const cerrarModal = () => {
+    setMostrarModalEliminar(false);
+    setEquipoAEliminar(null);
+    setTextoConfirmacion("");
+  };
+
+  const eliminarEquipo = async () => {
+    if (textoConfirmacion.trim() !== "ELIMINAR") {
+      mostrarAlertaError("Debe escribir ELIMINAR para continuar");
+      return;
+    }
 
     try {
-      await eliminarEquipoApi(id);
-      alert("¡Equipo eliminado exitosamente!");
-      obtenerEquipos(); // Recarga la tabla de inmediato
+      await eliminarEquipoApi(equipoAEliminar.id);
+      cerrarModal();
+      obtenerEquipos();
     } catch (error) {
       console.error("Error eliminando equipo:", error);
-      alert("Ocurrió un error al intentar eliminar el equipo. Revisa la consola.");
+      mostrarAlertaError(error?.message);
     }
   };
 
   const badgeEstado = (estado) => {
-    if (estado === "AL_DIA") {
-      return <span className="estado verde">Al día</span>;
-    }
-
-    if (estado === "PROXIMO") {
-      return <span className="estado amarillo">Preventivo</span>;
-    }
-
-    if (estado === "VENCIDO") {
-      return <span className="estado rojo">Crítico</span>;
-    }
-
+    if (estado === "AL_DIA") return <span className="estado verde">Al día</span>;
+    if (estado === "PROXIMO") return <span className="estado amarillo">Preventivo</span>;
+    if (estado === "VENCIDO") return <span className="estado rojo">Crítico</span>;
     return <span className="estado">-</span>;
   };
 
   const equiposFiltrados = listaEquipos.filter((e) => {
     const coincideBusqueda =
-      (e.nombre || "")
-        .toLowerCase()
-        .includes(busqueda.toLowerCase()) ||
-      (e.tipo || "")
-        .toLowerCase()
-        .includes(busqueda.toLowerCase());
-
-    
+      (e.nombre || "").toLowerCase().includes(busqueda.toLowerCase()) ||
+      (e.tipo || "").toLowerCase().includes(busqueda.toLowerCase());
     const estado = (e.estado || "").toUpperCase();
     const coincideFiltro = filtro === "todos" || estado === filtro;
-
     return coincideBusqueda && coincideFiltro;
   });
 
-  if (loading) {
-    return <h2 className="loading">Cargando equipos...</h2>;
-  }
+  if (loading) return <h2 className="loading">Cargando equipos...</h2>;
 
   return (
     <motion.div
@@ -90,6 +96,10 @@ function Equipos() {
       exit={{ opacity: 0, y: -12 }}
       transition={{ duration: 0.22 }}
     >
+
+      {mostrarError && (
+        <div className="alerta-error">{mensajeError}</div>
+      )}
 
       <div className="equipos-header">
         <h1>Equipos</h1>
@@ -104,11 +114,7 @@ function Equipos() {
       />
 
       <div className="filtros">
-        
-        <select
-          value={filtro}
-          onChange={(e) => setFiltro(e.target.value)}
-        >
+        <select value={filtro} onChange={(e) => setFiltro(e.target.value)}>
           <option value="todos">Todos los Estados</option>
           <option value="AL_DIA">🟢 Al día</option>
           <option value="PROXIMO">🟡 Preventivo</option>
@@ -126,12 +132,9 @@ function Equipos() {
             <th>ACCIONES</th>
           </tr>
         </thead>
-
         <tbody>
           {equiposFiltrados.length === 0 ? (
-            <tr>
-              <td colSpan="5">No hay equipos</td>
-            </tr>
+            <tr><td colSpan="5">No hay equipos</td></tr>
           ) : (
             equiposFiltrados.map((equipo) => (
               <tr key={equipo.id}>
@@ -142,7 +145,7 @@ function Equipos() {
                 <td>
                   <button
                     className="eliminar"
-                    onClick={() => eliminarEquipo(equipo.id)}
+                    onClick={() => abrirModalEliminar(equipo)}
                   >
                     Eliminar
                   </button>
@@ -152,6 +155,42 @@ function Equipos() {
           )}
         </tbody>
       </table>
+
+      {mostrarModalEliminar && (
+        <div className="modal-overlay">
+          <div className="modal-eliminar">
+
+            <h2>Eliminar Equipo</h2>
+
+            <p>Está a punto de eliminar el siguiente equipo:</p>
+
+            <strong>{equipoAEliminar?.nombre}</strong>
+
+            <p className="texto-warning">
+              Esta acción es permanente y eliminará también todo el historial de mantenciones.
+            </p>
+
+            <p>Para continuar escriba:<strong> ELIMINAR</strong></p>
+
+            <input
+              type="text"
+              placeholder="Escriba ELIMINAR"
+              value={textoConfirmacion}
+              onChange={(e) => setTextoConfirmacion(e.target.value)}
+            />
+
+            <div className="modal-botones">
+              <button className="btn-cancelar" onClick={cerrarModal}>
+                Cancelar
+              </button>
+              <button className="btn-confirmar-eliminar" onClick={eliminarEquipo}>
+                Eliminar Equipo
+              </button>
+            </div>
+
+          </div>
+        </div>
+      )}
 
     </motion.div>
   );

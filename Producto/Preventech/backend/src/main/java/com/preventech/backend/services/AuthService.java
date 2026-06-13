@@ -1,6 +1,5 @@
 package com.preventech.backend.services;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -12,11 +11,14 @@ import com.preventech.backend.security.JwtService;
 @Service
 public class AuthService {
 
-    @Autowired
-    private AuthenticationManager authenticationManager;
+    private final AuthenticationManager authenticationManager;
 
-    @Autowired
-    private JwtService jwtService;
+    private final JwtService jwtService;
+
+    AuthService(AuthenticationManager authenticationManager, JwtService jwtService) {
+        this.authenticationManager = authenticationManager;
+        this.jwtService = jwtService;
+    }
 
     public String login(Usuario usuario) {
 

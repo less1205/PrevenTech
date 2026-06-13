@@ -2,7 +2,7 @@ package com.preventech.backend.entities;
 
 import java.util.List;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.preventech.backend.enums.Rol;
 
 import jakarta.persistence.*;
@@ -15,7 +15,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
-
 @Entity
 public class Usuario {
 
@@ -36,7 +35,7 @@ public class Usuario {
 
     @NotBlank(message = "Debe ingresar una contraseña")
     @Pattern(
-        regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[!@#$%^&*()_+\\-=\\[\\]{};':\"\\\\|,.<>/?]).{8,}$",
+        regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[!@#$%^&*()_+\\-=\\[\\]{};':\\\"\\\\|,.<>/?]).{8,}$",
         message = "La contraseña debe tener mínimo 8 caracteres, una mayúscula, una minúscula, un número y un carácter especial"
     )
     private String password;
@@ -44,7 +43,7 @@ public class Usuario {
     @Enumerated(EnumType.STRING)
     private Rol rol;
 
-    @JsonManagedReference("usuario-mantencion")
+    @JsonIgnoreProperties("usuario")
     @OneToMany(mappedBy = "usuario")
     private List<Mantencion> mantenciones;
 }

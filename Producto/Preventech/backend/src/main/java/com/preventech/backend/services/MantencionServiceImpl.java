@@ -2,7 +2,6 @@ package com.preventech.backend.services;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.preventech.backend.entities.Mantencion;
@@ -11,8 +10,11 @@ import com.preventech.backend.repositories.MantencionRepository;
 @Service
 public class MantencionServiceImpl implements MantencionService {
 
-    @Autowired
-    private MantencionRepository mantencionRepository;
+    private final MantencionRepository mantencionRepository;
+
+    MantencionServiceImpl(MantencionRepository mantencionRepository) {
+        this.mantencionRepository = mantencionRepository;
+    }
 
     @Override
     public Mantencion crear(Mantencion mantencion) {
@@ -59,6 +61,10 @@ public class MantencionServiceImpl implements MantencionService {
 
         if (mantencionActualizada.getProximaFecha() != null) {
             existente.setProximaFecha(mantencionActualizada.getProximaFecha());
+        }
+
+        if (mantencionActualizada.getEstado() != null) {
+            existente.setEstado(mantencionActualizada.getEstado());
         }
 
         return mantencionRepository.save(existente);

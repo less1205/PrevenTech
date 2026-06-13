@@ -1,0 +1,231 @@
+.nb-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.nb-btn {
+  position: relative;
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.06);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s, transform 0.15s;
+  flex-shrink: 0;
+}
+
+.nb-btn:hover {
+  background: rgba(139, 92, 246, 0.18);
+  transform: scale(1.05);
+}
+
+.nb-icon {
+  font-size: 18px;
+  line-height: 1;
+}
+
+.nb-badge {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 4px;
+  background: #ef4444;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  border-radius: 9px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid #0f172a;
+  animation: nb-pop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes nb-pop {
+  0%   { transform: scale(0); }
+  100% { transform: scale(1); }
+}
+
+@keyframes nb-shake {
+  0%, 100% { transform: rotate(0deg); }
+  20%       { transform: rotate(-15deg); }
+  40%       { transform: rotate(15deg); }
+  60%       { transform: rotate(-10deg); }
+  80%       { transform: rotate(10deg); }
+}
+
+.nb-shake .nb-icon {
+  animation: nb-shake 0.6s ease;
+}
+
+.nb-panel {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  width: 320px;
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.18), 0 4px 16px rgba(0, 0, 0, 0.08);
+  border: 1px solid #e2e8f0;
+  z-index: 9999;
+  overflow: hidden;
+  animation: nb-slide-down 0.2s ease;
+}
+
+@keyframes nb-slide-down {
+  from { opacity: 0; transform: translateY(-8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.nb-panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 16px 10px;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.nb-panel-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+.nb-panel-count {
+  font-size: 11px;
+  color: #94a3b8;
+}
+
+.nb-list {
+  list-style: none;
+  margin: 0;
+  padding: 6px 0;
+  max-height: 340px;
+  overflow-y: auto;
+}
+
+.nb-item {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  padding: 10px 14px;
+  border-left: 3px solid transparent;
+  border-bottom: 1px solid #f8fafc;
+  transition: background 0.15s;
+}
+
+.nb-item:last-child {
+  border-bottom: none;
+}
+
+.nb-item:hover {
+  background: #f8fafc;
+}
+
+.nb-item-icon {
+  font-size: 16px;
+  margin-top: 1px;
+  flex-shrink: 0;
+}
+
+.nb-item-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.nb-item-tipo {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 1px 6px;
+  border-radius: 4px;
+  margin-bottom: 3px;
+}
+
+.nb-item-msg {
+  margin: 0;
+  font-size: 12px;
+  color: #334155;
+  line-height: 1.4;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.nb-item-fecha {
+  font-size: 10px;
+  color: #94a3b8;
+  margin-top: 2px;
+  display: block;
+}
+
+.nb-critico {
+  border-left-color: #fb7185;
+  background: #fff9f9;
+}
+.nb-critico .nb-item-tipo {
+  background: #fef2f2;
+  color: #e11d48;
+}
+
+.nb-preventivo {
+  border-left-color: #fbbf24;
+  background: #fffef5;
+}
+.nb-preventivo .nb-item-tipo {
+  background: #fffbeb;
+  color: #d97706;
+}
+
+.nb-ok {
+  border-left-color: #34d399;
+  background: #f8fffe;
+}
+.nb-ok .nb-item-tipo {
+  background: #ecfdf5;
+  color: #059669;
+}
+
+.nb-info {
+  border-left-color: #818cf8;
+}
+.nb-info .nb-item-tipo {
+  background: #f5f3ff;
+  color: #6d28d9;
+}
+
+.nb-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 28px 16px;
+  color: #94a3b8;
+}
+.nb-empty span { font-size: 28px; }
+.nb-empty p { margin: 0; font-size: 13px; }
+
+.nb-panel-footer {
+  padding: 10px 16px;
+  border-top: 1px solid #f1f5f9;
+  text-align: right;
+}
+
+.nb-ver-todas {
+  font-size: 12px;
+  font-weight: 600;
+  color: #8b5cf6;
+  text-decoration: none;
+}
+.nb-ver-todas:hover {
+  color: #6d28d9;
+  text-decoration: underline;
+}

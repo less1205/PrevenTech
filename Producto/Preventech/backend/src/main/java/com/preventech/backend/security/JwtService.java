@@ -2,7 +2,6 @@ package com.preventech.backend.security;
 
 import java.util.Date;
 import javax.crypto.SecretKey;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.preventech.backend.webconfig.JwtProperties;
 import io.jsonwebtoken.Claims;
@@ -13,10 +12,14 @@ import io.jsonwebtoken.security.Keys;
 @Service
 public class JwtService {
 
-    @Autowired
-    private JwtProperties jwtProperties;
+    private final JwtProperties jwtProperties;
 
-    
+
+    JwtService(JwtProperties jwtProperties) {
+        this.jwtProperties = jwtProperties;
+    }
+
+
     private SecretKey getKey() {
         byte[] keyBytes = Decoders.BASE64.decode(jwtProperties.getSecret());
         return Keys.hmacShaKeyFor(keyBytes);

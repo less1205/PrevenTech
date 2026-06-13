@@ -19,95 +19,63 @@ function Sidebar() {
     .toUpperCase();
 
   const cerrarSesion = () => {
-
     localStorage.removeItem("token");
     localStorage.removeItem("nombre");
     localStorage.removeItem("rol");
-
     navigate("/");
   };
 
   return (
-
     <div className="sidebar">
 
       <div className="logo">
-
-        <div className="logo-icon">
-          🏢
-        </div>
-
+        <div className="logo-icon">🏢</div>
         <div>
           <h2>PrevenTech</h2>
           <span>Gestión Integral</span>
         </div>
-
       </div>
 
       <nav className="menu">
 
-        <NavLink
-          to="/dashboard"
-          className="item"
-        >
+        <NavLink to="/dashboard" className="item">
           📊 Dashboard
         </NavLink>
 
-        <NavLink
-          to="/inventario"
-          className="item"
-        >
+        <NavLink to="/inventario" className="item">
           📦 Inventario
         </NavLink>
 
         {rol?.includes("ADMINISTRADOR") && (
-          <NavLink
-            to="/usuarios"
-            className="item"
-          >
+          <NavLink to="/usuarios" className="item">
             👥 Usuarios
           </NavLink>
         )}
 
-        <NavLink
-          to="/equipos"
-          className="item"
-        >
+        <NavLink to="/equipos" className="item">
           ⚙️ Equipos
         </NavLink>
 
-        <NavLink
-          to="/mantenciones"
-          className="item"
-        >
+        <NavLink to="/mantenciones" className="item">
           🔧 Mantenciones
+        </NavLink>
+
+        <NavLink to="/alertas" className="item">
+          🔔 Alertas
         </NavLink>
 
       </nav>
 
       <div className="perfil">
-
-        <div className="avatar">
-          {iniciales}
-        </div>
-
+        <div className="avatar">{iniciales}</div>
         <div>
-
           <p>{nombre}</p>
-
-          <span>
-            {rol}
-          </span>
-
+          <span>{rol}</span>
         </div>
-
       </div>
 
-      <button
-        className="btn-logout"
-        onClick={cerrarSesion}
-      >
-       Cerrar sesión
+      <button className="btn-logout" onClick={cerrarSesion}>
+        Cerrar sesión
       </button>
 
     </div>

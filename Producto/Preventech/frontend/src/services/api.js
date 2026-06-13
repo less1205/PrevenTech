@@ -2,6 +2,9 @@ const API = "http://localhost:8080/api";
 
 const getHeaders = () => {
   const token = localStorage.getItem("token");
+  if (!token) {
+    throw new Error("No hay sesión activa. Por favor inicia sesión nuevamente.");
+  }
   return {
     "Content-Type": "application/json",
     "Authorization": `Bearer ${token}`
@@ -80,7 +83,11 @@ export const crearMantencion = async (mantencion) => {
     body: JSON.stringify(mantencion)
   });
   if (!response.ok) {
-    throw new Error("Error creando mantención");
+    if (response.status === 403) {
+      throw new Error("Sesión expirada o sin permisos. Por favor inicia sesión nuevamente.");
+    }
+    const errorText = await response.text().catch(() => "");
+    throw new Error(errorText || `Error ${response.status} al guardar la mantención`);
   }
   return await response.json();
 };
@@ -91,6 +98,16 @@ export const obtenerAlertas = async () => {
   });
   if (!response.ok) {
     throw new Error("Error obteniendo alertas");
+  }
+  return await response.json();
+};
+
+export const obtenerAlertasRecientes = async () => {
+  const response = await fetch(`${API}/alertas/recientes`, {
+    headers: getHeaders()
+  });
+  if (!response.ok) {
+    throw new Error("Error obteniendo alertas recientes");
   }
   return await response.json();
 };
@@ -130,3 +147,60 @@ export const eliminarUsuario = async (id) => {
   }
   return true;
 };
+
+export const subirEvidencia = async (file) => {
+  const token = localStorage.getItem("token");
+  if (!token) {
+    throw new Error("No hay sesión activa. Por favor inicia sesión nuevamente.");
+  }
+
+  const formData = new FormData();
+  formData.append("file", file);
+
+  const response = await fetch(`${API}/upload/evidencia`, {
+    method: "POST",
+    headers: {
+      "Authorization": `Bearer ${token}`
+    },
+    body: formData
+  });
+
+  if (!response.ok) {
+    if (response.status === 403) {
+      throw new Error("Sesión expirada o sin permisos. Por favor inicia sesión nuevamente.");
+    }
+    const errorData = await response.json().catch(() => ({}));
+    throw new Error(errorData.error || "Error al subir la evidencia");
+  }
+
+  return await response.json();
+};
+
+export const subirEvidenciaMantencion = async (id, file) => {
+  const token = localStorage.getItem("token");
+  if (!token) {
+    throw new Error("No hay sesión activa. Por favor inicia sesión nuevamente.");
+  }
+
+  const formData = new FormData();
+  formData.append("file", file);
+
+  const response = await fetch(`${API}/mantenciones/${id}/evidencia`, {
+    method: "PATCH",
+    headers: {
+      "Authorization": `Bearer ${token}`
+    },
+    body: formData
+  });
+
+  if (!response.ok) {
+    if (response.status === 403) {
+      throw new Error("Sesión expirada o sin permisos. Por favor inicia sesión nuevamente.");
+    }
+    throw new Error("Error al subir la evidencia");
+  }
+
+  return await response.json();
+};
+
+export const BASE_URL = API.replace("/api", "");

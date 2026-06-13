@@ -7,6 +7,13 @@
   gap: 20px;
 }
 
+.dashboard-saludo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 4px;
+}
+
 .dashboard-title {
   font-size: 26px;
   font-weight: 700;
@@ -17,7 +24,8 @@
 .dashboard-subtitle {
   font-size: 14px;
   color: #64748b;
-  margin-top: -10px;
+  margin: 4px 0 0;
+  text-transform: capitalize;
 }
 
 .cards-grid {
@@ -31,7 +39,6 @@
   grid-template-columns: 2fr 1fr;
   gap: 20px;
   align-items: start;
-  margin-top: 20px;
 }
 
 .panel {
@@ -39,25 +46,79 @@
   border-radius: 16px;
   padding: 22px;
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.06);
-}
-
-.panel:first-child {
-  margin-top: 20px;
+  transition: all 0.2s ease;
 }
 
 .panel:hover {
   transform: translateY(-2px);
   box-shadow: 0 10px 28px rgba(0, 0, 0, 0.08);
-  transition: all 0.2s ease;
 }
 
 .panel-title {
   font-size: 15px;
   font-weight: 600;
   color: #1e293b;
-  margin-bottom: 12px;
+  margin: 0 0 16px;
 }
 
-.grafico-panel {
-  margin-top: 20px;
+.proximas-panel {
+  margin-top: 0;
+}
+
+.proximas-vacio {
+  color: #94a3b8;
+  font-size: 14px;
+  margin: 0;
+}
+
+.proximas-tabla {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.proximas-tabla th {
+  text-align: left;
+  padding: 10px 12px;
+  color: #6d28d9;
+  font-weight: 600;
+  background: #f5f3ff;
+  border-radius: 8px;
+}
+
+.proximas-tabla td {
+  padding: 12px;
+  color: #475569;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.proximas-tabla tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.proximas-tabla tbody tr:hover {
+  background: #fafafa;
+}
+
+.dias-badge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.dias-badge.urgente {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+.dias-badge.proximo {
+  background: #fef9c3;
+  color: #b45309;
+}
+
+.dias-badge.ok {
+  background: #dcfce7;
+  color: #16a34a;
 }

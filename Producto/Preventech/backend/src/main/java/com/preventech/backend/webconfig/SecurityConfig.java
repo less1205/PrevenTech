@@ -47,31 +47,24 @@ public class SecurityConfig {
 
         http
             .csrf(csrf -> csrf.disable())
-
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-
             .sessionManagement(session ->
                 session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             )
-
-        .authorizeHttpRequests(auth -> auth
-
-            .requestMatchers(
-                    "/auth/**",
-                    "/swagger-ui/**",
-                    "/v3/api-docs/**"
-            ).permitAll()
-
-            .requestMatchers(
-                    org.springframework.http.HttpMethod.OPTIONS,
-                    "/**"
-            ).permitAll()
-
-            .anyRequest().authenticated()
-        )
-
+            .authorizeHttpRequests(auth -> auth
+                .requestMatchers(
+                        "/auth/**",
+                        "/swagger-ui/**",
+                        "/v3/api-docs/**",
+                        "/uploads/**"          
+                ).permitAll()
+                .requestMatchers(
+                        org.springframework.http.HttpMethod.OPTIONS,
+                        "/**"
+                ).permitAll()
+                .anyRequest().authenticated()
+            )
             .authenticationProvider(authenticationProvider())
-
             .addFilterBefore(
                     jwtAuthenticationFilter,
                     UsernamePasswordAuthenticationFilter.class
@@ -82,56 +75,26 @@ public class SecurityConfig {
 
     @Bean
     public DaoAuthenticationProvider authenticationProvider() {
-
         DaoAuthenticationProvider authProvider =
                 new DaoAuthenticationProvider(customUsuarioDetailsService);
-
         authProvider.setPasswordEncoder(passwordEncoder());
-
         return authProvider;
     }
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
 
-        CorsConfiguration configuration =
-                new CorsConfiguration();
+        configuration.setAllowedOrigins(List.of("http://localhost:5173"));
 
-        configuration.setAllowedOrigins(
-                List.of("http://localhost:5173")
-        );
+        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
 
-        configuration.setAllowedMethods(
-                List.of(
-                        "GET",
-                        "POST",
-                        "PUT",
-                        "DELETE",
-                        "OPTIONS"
-                )
-        );
-
-        configuration.setAllowedHeaders(
-                List.of(
-                        "Authorization",
-                        "Content-Type"
-                )
-        );
-
-        configuration.setExposedHeaders(
-                List.of("Authorization")
-        );
-
+        configuration.setAllowedHeaders(List.of("Authorization", "Content-Type"));
+        configuration.setExposedHeaders(List.of("Authorization"));
         configuration.setAllowCredentials(true);
 
-        UrlBasedCorsConfigurationSource source =
-                new UrlBasedCorsConfigurationSource();
-
-        source.registerCorsConfiguration(
-                "/**",
-                configuration
-        );
-
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
         return source;
     }
 
@@ -144,7 +107,6 @@ public class SecurityConfig {
     public AuthenticationManager authenticationManager(
             AuthenticationConfiguration config
     ) throws Exception {
-
         return config.getAuthenticationManager();
     }
 }

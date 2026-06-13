@@ -2,7 +2,6 @@ package com.preventech.backend.services;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.preventech.backend.entities.Equipo;
@@ -11,8 +10,11 @@ import com.preventech.backend.repositories.EquipoRepository;
 @Service
 public class EquipoServiceImpl implements EquipoService {
 
-    @Autowired
-    private EquipoRepository equipoRepository;
+    private final EquipoRepository equipoRepository;
+
+    EquipoServiceImpl(EquipoRepository equipoRepository) {
+        this.equipoRepository = equipoRepository;
+    }
 
     @Override
     public Equipo crear(Equipo equipo) {

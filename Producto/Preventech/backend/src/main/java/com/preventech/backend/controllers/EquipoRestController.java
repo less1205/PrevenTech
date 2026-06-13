@@ -2,7 +2,6 @@ package com.preventech.backend.controllers;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -14,8 +13,11 @@ import com.preventech.backend.services.EquipoService;
 @RequestMapping("/api/equipos")
 public class EquipoRestController {
 
-    @Autowired
-    private EquipoService equipoService;
+    private final EquipoService equipoService;
+
+    EquipoRestController(EquipoService equipoService) {
+        this.equipoService = equipoService;
+    }
 
     @PostMapping
     public ResponseEntity<Equipo> crear(@RequestBody Equipo equipo) {

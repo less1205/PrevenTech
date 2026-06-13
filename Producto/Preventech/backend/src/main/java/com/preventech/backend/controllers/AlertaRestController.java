@@ -1,7 +1,6 @@
 package com.preventech.backend.controllers;
 
 import java.util.List;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,8 +12,11 @@ import com.preventech.backend.services.AlertaService;
 @RequestMapping("/api/alertas")
 public class AlertaRestController {
 
-    @Autowired
-    private AlertaService alertaService;
+    private final AlertaService alertaService;
+
+    AlertaRestController(AlertaService alertaService) {
+        this.alertaService = alertaService;
+    }
 
     @PostMapping
     public ResponseEntity<Alerta> crear(@RequestBody Alerta alerta) {
@@ -24,6 +26,17 @@ public class AlertaRestController {
     @GetMapping
     public ResponseEntity<List<Alerta>> listar() {
         return ResponseEntity.ok(alertaService.listarTodos());
+    }
+
+    @GetMapping("/recientes")
+    public ResponseEntity<List<Alerta>> listarRecientes() {
+        return ResponseEntity.ok(alertaService.listarRecientes());
+    }
+
+    @PostMapping("/generar")
+    public ResponseEntity<Void> generarAlertas() {
+        alertaService.generarAlertasDesdeMantencion();
+        return ResponseEntity.ok().build();
     }
 
     @GetMapping("/{id}")

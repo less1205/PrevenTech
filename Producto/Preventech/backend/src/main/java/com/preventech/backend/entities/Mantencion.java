@@ -37,7 +37,7 @@ public class Mantencion {
 
     @ManyToOne
     @JoinColumn(name = "usuario_id")
-    @JsonIgnoreProperties("mantenciones") // CORREGIDO: Cambiado de JsonBackReference a JsonIgnoreProperties
+    @JsonIgnoreProperties("mantenciones")
     private Usuario usuario;
 
     @OneToOne(mappedBy = "mantencion", cascade = CascadeType.ALL, orphanRemoval = true)

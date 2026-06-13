@@ -1,8 +1,8 @@
 import "../styles/mantenciones.css";
 import "../styles/card.css";
 import { useEffect, useState } from "react";
-import { motion } from "framer-motion";
-import { obtenerMantenciones, obtenerEquipos, obtenerUsuarios, crearMantencion } from "../services/api";
+import { motion, AnimatePresence } from "framer-motion";
+import { obtenerMantenciones, obtenerEquipos, obtenerUsuarios, crearMantencion, subirEvidencia, subirEvidenciaMantencion, BASE_URL } from "../services/api";
 
 function Mantenciones() {
   const [mantenciones, setMantenciones] = useState([]);
@@ -14,12 +14,22 @@ function Mantenciones() {
   const [fechaInicioFiltro, setFechaInicioFiltro] = useState("");
   const [fechaFinFiltro, setFechaFinFiltro] = useState("");
 
-  // NUEVOS ESTADOS: Control del modal y datos de los selectores
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [equipos, setEquipos] = useState([]);
   const [usuarios, setUsuarios] = useState([]);
-  
-  // Estado para el formulario de la nueva mantención
+
+  const [formError, setFormError] = useState("");
+  const [subiendoArchivo, setSubiendoArchivo] = useState(false);
+
+  const [imagenVistaPrevia, setImagenVistaPrevia] = useState(null);
+
+  const [modalEvidencia, setModalEvidencia] = useState(null);
+  const [subiendoEvidenciaExistente, setSubiendoEvidenciaExistente] = useState(false);
+  const [errorEvidencia, setErrorEvidencia] = useState("");
+  const [evidenciaActualizada, setEvidenciaActualizada] = useState(false);
+
+  const [drawerMantencion, setDrawerMantencion] = useState(null);
+
   const [formData, setFormData] = useState({
     fecha: "",
     detalle: "",
@@ -30,7 +40,6 @@ function Mantenciones() {
     usuarioId: ""
   });
 
-  // Función para cargar la lista de mantenciones desde la API
   const cargarMantenciones = () => {
     obtenerMantenciones()
       .then(data => setMantenciones(data))
@@ -41,7 +50,6 @@ function Mantenciones() {
     cargarMantenciones();
   }, []);
 
-  // Cargar equipos y usuarios al abrir el modal para poblar los selectores
   useEffect(() => {
     if (isModalOpen) {
       obtenerEquipos()
@@ -54,6 +62,13 @@ function Mantenciones() {
     }
   }, [isModalOpen]);
 
+  // Cerrar drawer con Escape
+  useEffect(() => {
+    const handler = (e) => { if (e.key === "Escape") setDrawerMantencion(null); };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, []);
+
   const total = mantenciones.length;
   const vencidos = mantenciones.filter(m => m.estado === "VENCIDO").length;
   const proximos = mantenciones.filter(m => m.estado === "PROXIMO").length;
@@ -61,40 +76,84 @@ function Mantenciones() {
 
   const filtrados = mantenciones.filter(m => {
     const cumpleEstado = filtro === "todos" || m.estado === filtro;
-
     const fecha = new Date(m.fecha);
     const inicio = fechaInicioFiltro ? new Date(fechaInicioFiltro) : null;
     const fin = fechaFinFiltro ? new Date(fechaFinFiltro) : null;
-
     const cumpleFecha = (!inicio || fecha >= inicio) && (!fin || fecha <= fin);
-
     return cumpleEstado && cumpleFecha;
   });
 
   const badgeEstado = (estado) => {
-    if (estado === "AL_DIA") {
-      return <span className="estado verde">Al día</span>;
-    }
-    if (estado === "PROXIMO") {
-      return <span className="estado amarillo">Preventivo</span>;
-    }
-    if (estado === "VENCIDO") {
-      return <span className="estado rojo">Crítico</span>;
-    }
+    if (estado === "AL_DIA")  return <span className="estado verde">Al día</span>;
+    if (estado === "PROXIMO") return <span className="estado amarillo">Preventivo</span>;
+    if (estado === "VENCIDO") return <span className="estado rojo">Crítico</span>;
     return <span className="estado">-</span>;
   };
 
-  // Manejar cambios en las cajas de texto y selectores
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
 
-  // Manejar envío del formulario del modal hacia el backend
+  const handleArchivoChange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    setFormError("");
+    setSubiendoArchivo(true);
+
+    try {
+      const { url } = await subirEvidencia(file);
+      setFormData(prev => ({ ...prev, evidenciaUrl: url }));
+    } catch (err) {
+      console.error(err);
+      const msg = err.message || "Error al subir la imagen.";
+      setFormError(msg);
+      if (msg.toLowerCase().includes("sesión") || msg.toLowerCase().includes("sesion")) {
+        setTimeout(() => {
+          localStorage.removeItem("token");
+          window.location.href = "/";
+        }, 2000);
+      }
+    } finally {
+      setSubiendoArchivo(false);
+    }
+  };
+
+  const handleSubirEvidenciaExistente = async (e) => {
+    const file = e.target.files[0];
+    if (!file || !modalEvidencia) return;
+
+    setErrorEvidencia("");
+    setEvidenciaActualizada(false);
+    setSubiendoEvidenciaExistente(true);
+
+    try {
+      const actualizada = await subirEvidenciaMantencion(modalEvidencia.id, file);
+      setModalEvidencia(prev => ({ ...prev, evidenciaUrl: actualizada.evidenciaUrl }));
+      setEvidenciaActualizada(true);
+      cargarMantenciones();
+    } catch (err) {
+      setErrorEvidencia(err.message || "Error al subir la imagen.");
+    } finally {
+      setSubiendoEvidenciaExistente(false);
+    }
+  };
+
+  const cerrarModalEvidencia = () => {
+    setModalEvidencia(null);
+    setErrorEvidencia("");
+    setEvidenciaActualizada(false);
+  };
+
+  const cerrarModal = () => {
+    setIsModalOpen(false);
+    setFormError("");
+  };
+
   const handleFormSubmit = (e) => {
     e.preventDefault();
 
-    // Mapeamos el JSON construyendo los objetos anidados requeridos por las entidades JPA
     const payload = {
       fecha: formData.fecha,
       detalle: formData.detalle,
@@ -105,11 +164,10 @@ function Mantenciones() {
       usuario: { id: parseInt(formData.usuarioId) }
     };
 
+    setFormError("");
     crearMantencion(payload)
       .then(() => {
-        alert("¡Mantención registrada exitosamente!");
-        setIsModalOpen(false); // Cerramos el modal
-        // Limpiamos los campos del formulario
+        cerrarModal();
         setFormData({
           fecha: "",
           detalle: "",
@@ -119,11 +177,18 @@ function Mantenciones() {
           equipoId: "",
           usuarioId: ""
         });
-        cargarMantenciones(); // Refrescamos la tabla automáticamente
+        cargarMantenciones();
       })
       .catch(err => {
         console.error(err);
-        alert("Ocurrió un error al guardar la mantención.");
+        const msg = err.message || "Error al guardar la mantención.";
+        setFormError(msg);
+        if (msg.toLowerCase().includes("sesión") || msg.toLowerCase().includes("sesion")) {
+          setTimeout(() => {
+            localStorage.removeItem("token");
+            window.location.href = "/";
+          }, 2000);
+        }
       });
   };
 
@@ -135,25 +200,9 @@ function Mantenciones() {
       exit={{ opacity: 0, y: -12 }}
       transition={{ duration: 0.22 }}
     >
-      {/* SECCIÓN DEL ENCABEZADO CON EL NUEVO BOTÓN */}
-      <div style={{ display: "flex", justifyContent: "between", alignItems: "center", width: "100%", marginBottom: "1rem" }}>
-        <h1 style={{ margin: 0 }}>Mantenciones</h1>
-        <button 
-          onClick={() => setIsModalOpen(true)}
-          style={{
-            backgroundColor: "#2563eb",
-            color: "white",
-            border: "none",
-            padding: "10px 18px",
-            borderRadius: "8px",
-            fontWeight: "600",
-            cursor: "pointer",
-            fontSize: "14px",
-            transition: "background-color 0.2s"
-          }}
-          onMouseOver={(e) => e.target.style.backgroundColor = "#1d4ed8"}
-          onMouseOut={(e) => e.target.style.backgroundColor = "#2563eb"}
-        >
+      <div className="page-header">
+        <h1>Mantenciones</h1>
+        <button className="btn-nueva-mantencion" onClick={() => setIsModalOpen(true)}>
           + Nueva Mantención
         </button>
       </div>
@@ -192,96 +241,292 @@ function Mantenciones() {
         <input type="date" value={fechaInicio} onChange={(e) => setFechaInicio(e.target.value)} />
         <input type="date" value={fechaFin} onChange={(e) => setFechaFin(e.target.value)} />
 
-        <button onClick={() => {
-          setFechaInicioFiltro(fechaInicio);
-          setFechaFinFiltro(fechaFin);
-        }}>
+        <button onClick={() => { setFechaInicioFiltro(fechaInicio); setFechaFinFiltro(fechaFin); }}>
           Filtrar
         </button>
 
         <button onClick={() => {
-          setFechaInicio("");
-          setFechaFin("");
-          setFechaInicioFiltro("");
-          setFechaFinFiltro("");
+          setFechaInicio(""); setFechaFin("");
+          setFechaInicioFiltro(""); setFechaFinFiltro("");
         }}>
           Limpiar
         </button>
       </div>
 
-      <table className="tabla">
-        <thead>
-          <tr>
-            <th>EQUIPO</th>
-            <th>FECHA</th>
-            <th>TIPO</th>
-            <th>ESTADO</th>
-            <th>PRÓXIMA</th>
-          </tr>
-        </thead>
-        <tbody>
-          {filtrados.map(m => (
-            <tr key={m.id}>
-              <td>{m.equipo?.nombre}</td>
-              <td>{m.fecha}</td>
-              <td>Preventiva</td>
-              <td>{badgeEstado(m.estado)}</td>
-              <td>{m.proximaFecha || "-"}</td>
+      <div className="tabla-wrapper">
+        <table className="tabla">
+          <thead>
+            <tr>
+              <th>EQUIPO</th>
+              <th>DETALLE</th>
+              <th>TÉCNICO</th>
+              <th>FECHA</th>
+              <th>TIPO</th>
+              <th>ESTADO</th>
+              <th>PRÓXIMA</th>
+              <th>EVIDENCIA</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
-
-      {/* ======================================================== */}
-      {/* VISTA DEL MODAL EMERGENTE EN CAPAS TRASLÚCIDAS CSS       */}
-      {/* ======================================================== */}
-      {isModalOpen && (
-        <div style={{
-          position: "fixed",
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          backgroundColor: "rgba(0, 0, 0, 0.52)",
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          zIndex: 2000,
-          padding: "20px"
-        }}>
-          <div style={{
-            backgroundColor: "white",
-            borderRadius: "12px",
-            width: "100%",
-            maxWidth: "520px",
-            boxShadow: "0 20px 25px -5px rgba(0,0,0,0.15)",
-            overflow: "hidden",
-            color: "#334155",
-            fontFamily: "sans-serif"
-          }}>
-            {/* Encabezado del Modal */}
-            <div style={{
-              backgroundColor: "#1e293b",
-              color: "white",
-              padding: "16px 24px",
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center"
-            }}>
-              <h3 style={{ margin: 0, fontSize: "18px", fontWeight: "600" }}>Registrar Nueva Mantención</h3>
-              <button 
-                onClick={() => setIsModalOpen(false)}
-                style={{ background: "none", border: "none", color: "#94a3b8", fontSize: "24px", cursor: "pointer", lineHeight: 1 }}
+          </thead>
+          <tbody>
+            {filtrados.map(m => (
+              <tr
+                key={m.id}
+                className="tabla-fila-clickable"
+                onClick={() => setDrawerMantencion(m)}
               >
-                &times;
-              </button>
+                <td>{m.equipo?.nombre}</td>
+                <td className="td-detalle">{m.detalle}</td>
+                <td>{m.usuario?.nombre}</td>
+                <td>{m.fecha}</td>
+                <td>Preventiva</td>
+                <td>{badgeEstado(m.estado)}</td>
+                <td>{m.proximaFecha || "-"}</td>
+                <td onClick={(e) => e.stopPropagation()}>
+                  {m.evidenciaUrl ? (
+                    <div style={{ display: "flex", gap: "6px", alignItems: "center", flexWrap: "wrap" }}>
+                      <button
+                        className="btn-ver-evidencia"
+                        onClick={() => setImagenVistaPrevia(`${BASE_URL}${m.evidenciaUrl}`)}
+                      >
+                        📷 Ver foto
+                      </button>
+                      <button
+                        className="btn-ver-evidencia"
+                        style={{ borderColor: "#aaa", color: "#aaa" }}
+                        onClick={() => { setModalEvidencia({ id: m.id, evidenciaUrl: m.evidenciaUrl }); setEvidenciaActualizada(false); }}
+                      >
+                        ↑ Reemplazar
+                      </button>
+                    </div>
+                  ) : (
+                    <div style={{ display: "flex", gap: "6px", alignItems: "center" }}>
+                      <span style={{ color: "#aaa", fontSize: "13px" }}>Sin evidencia</span>
+                      <button
+                        className="btn-ver-evidencia"
+                        onClick={() => { setModalEvidencia({ id: m.id, evidenciaUrl: null }); setEvidenciaActualizada(false); }}
+                      >
+                        ↑ Subir foto
+                      </button>
+                    </div>
+                  )}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      {/* Drawer lateral de detalle */}
+      <AnimatePresence>
+        {drawerMantencion && (
+          <>
+            <motion.div
+              className="drawer-overlay"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setDrawerMantencion(null)}
+            />
+            <motion.div
+              className="drawer"
+              initial={{ x: "100%" }}
+              animate={{ x: 0 }}
+              exit={{ x: "100%" }}
+              transition={{ type: "tween", duration: 0.25 }}
+            >
+              <div className="drawer-header">
+                <h3>Detalle de Mantención</h3>
+                <button className="drawer-close-btn" onClick={() => setDrawerMantencion(null)}>&times;</button>
+              </div>
+
+              <div className="drawer-body">
+                <div className="drawer-field">
+                  <span className="drawer-label">Equipo</span>
+                  <span className="drawer-value">{drawerMantencion.equipo?.nombre || "-"}</span>
+                </div>
+
+                <div className="drawer-field">
+                  <span className="drawer-label">Técnico</span>
+                  <span className="drawer-value">{drawerMantencion.usuario?.nombre || "-"}</span>
+                </div>
+
+                <div className="drawer-field">
+                  <span className="drawer-label">Fecha de Ejecución</span>
+                  <span className="drawer-value">{drawerMantencion.fecha}</span>
+                </div>
+
+                <div className="drawer-field">
+                  <span className="drawer-label">Próxima Fecha</span>
+                  <span className="drawer-value">{drawerMantencion.proximaFecha || "-"}</span>
+                </div>
+
+                <div className="drawer-field">
+                  <span className="drawer-label">Tipo</span>
+                  <span className="drawer-value">Preventiva</span>
+                </div>
+
+                <div className="drawer-field">
+                  <span className="drawer-label">Estado</span>
+                  <span className="drawer-value">{badgeEstado(drawerMantencion.estado)}</span>
+                </div>
+
+                <div className="drawer-field drawer-field--full">
+                  <span className="drawer-label">Detalle del Trabajo</span>
+                  <p className="drawer-detalle">{drawerMantencion.detalle || "-"}</p>
+                </div>
+
+                <div className="drawer-field drawer-field--full">
+                  <span className="drawer-label">Evidencia</span>
+                  {drawerMantencion.evidenciaUrl ? (
+                    <div className="drawer-evidencia">
+                      <img
+                        src={`${BASE_URL}${drawerMantencion.evidenciaUrl}`}
+                        alt="Evidencia"
+                        className="drawer-img"
+                        onClick={() => setImagenVistaPrevia(`${BASE_URL}${drawerMantencion.evidenciaUrl}`)}
+                      />
+                      <div className="drawer-evidencia-btns">
+                        <button
+                          className="btn-ver-evidencia"
+                          onClick={() => setImagenVistaPrevia(`${BASE_URL}${drawerMantencion.evidenciaUrl}`)}
+                        >
+                          📷 Ver foto completa
+                        </button>
+                        <button
+                          className="btn-ver-evidencia"
+                          style={{ borderColor: "#aaa", color: "#aaa" }}
+                          onClick={() => { setModalEvidencia({ id: drawerMantencion.id, evidenciaUrl: drawerMantencion.evidenciaUrl }); setEvidenciaActualizada(false); }}
+                        >
+                          ↑ Reemplazar
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="drawer-evidencia-btns">
+                      <span style={{ color: "#aaa", fontSize: "13px" }}>Sin evidencia registrada</span>
+                      <button
+                        className="btn-ver-evidencia"
+                        onClick={() => { setModalEvidencia({ id: drawerMantencion.id, evidenciaUrl: null }); setEvidenciaActualizada(false); }}
+                      >
+                        ↑ Subir foto
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+
+      {/* Modal vista previa de imagen */}
+      {imagenVistaPrevia && (
+        <div className="modal-overlay" onClick={() => setImagenVistaPrevia(null)}>
+          <div
+            className="modal-card"
+            style={{ maxWidth: "600px", textAlign: "center" }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="modal-header">
+              <h3>Evidencia fotográfica</h3>
+              <button className="modal-close-btn" onClick={() => setImagenVistaPrevia(null)}>&times;</button>
+            </div>
+            <div style={{ padding: "16px" }}>
+              <img
+                src={imagenVistaPrevia}
+                alt="Evidencia"
+                style={{ maxWidth: "100%", maxHeight: "500px", borderRadius: "8px", objectFit: "contain" }}
+              />
+              <div style={{ marginTop: "12px" }}>
+                <a
+                  href={imagenVistaPrevia}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{ fontSize: "13px", color: "#4A90E2" }}
+                >
+                  Abrir en nueva pestaña ↗
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal subir/reemplazar evidencia en mantención existente */}
+      {modalEvidencia && (
+        <div className="modal-overlay" onClick={cerrarModalEvidencia}>
+          <div
+            className="modal-card"
+            style={{ maxWidth: "420px" }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="modal-header">
+              <h3>{modalEvidencia.evidenciaUrl ? "Reemplazar evidencia" : "Subir evidencia"}</h3>
+              <button className="modal-close-btn" onClick={cerrarModalEvidencia}>&times;</button>
+            </div>
+            <div style={{ padding: "16px" }}>
+
+              {modalEvidencia.evidenciaUrl && (
+                <div style={{ marginBottom: "12px" }}>
+                  <p style={{ fontSize: "13px", color: "#666", marginBottom: "8px" }}>Evidencia actual:</p>
+                  <img
+                    src={`${BASE_URL}${modalEvidencia.evidenciaUrl}`}
+                    alt="Evidencia actual"
+                    style={{ maxWidth: "100%", maxHeight: "200px", borderRadius: "6px", objectFit: "contain" }}
+                  />
+                </div>
+              )}
+
+              {!modalEvidencia.evidenciaUrl && (
+                <p style={{ fontSize: "13px", color: "#aaa", marginBottom: "12px" }}>
+                  No hay evidencia subida para esta mantención.
+                </p>
+              )}
+
+              <label style={{ fontSize: "14px", fontWeight: "500", display: "block", marginBottom: "8px" }}>
+                {modalEvidencia.evidenciaUrl ? "Seleccionar nueva foto:" : "Seleccionar foto:"}
+              </label>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleSubirEvidenciaExistente}
+                disabled={subiendoEvidenciaExistente}
+              />
+
+              {subiendoEvidenciaExistente && (
+                <p style={{ marginTop: "10px", fontSize: "13px", color: "#4A90E2" }}>Subiendo imagen...</p>
+              )}
+              {errorEvidencia && (
+                <p style={{ marginTop: "10px", fontSize: "13px", color: "#e53e3e" }}>❌ {errorEvidencia}</p>
+              )}
+              {evidenciaActualizada && !subiendoEvidenciaExistente && (
+                <p style={{ marginTop: "10px", fontSize: "13px", color: "#38a169" }}>✅ Evidencia actualizada correctamente</p>
+              )}
+
+              <div style={{ marginTop: "16px", textAlign: "right" }}>
+                <button className="btn-cancelar" onClick={cerrarModalEvidencia}>
+                  Cerrar
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal nuevo registro */}
+      {isModalOpen && (
+        <div className="modal-overlay">
+          <div className="modal-card">
+
+            <div className="modal-header">
+              <h3>Registrar Nueva Mantención</h3>
+              <button className="modal-close-btn" onClick={cerrarModal}>&times;</button>
             </div>
 
-            {/* Formulario */}
-            <form onSubmit={handleFormSubmit} style={{ padding: "24px", display: "flex", flexDirection: "column", gap: "14px" }}>
-              
-              <div>
-                <label style={{ display: "block", fontSize: "13px", fontWeight: "600", marginBottom: "5px" }}>Detalle del Trabajo</label>
+            <form className="modal-form" onSubmit={handleFormSubmit}>
+
+              <div className="form-group">
+                <label>Detalle del Trabajo</label>
                 <textarea
                   name="detalle"
                   required
@@ -289,43 +534,39 @@ function Mantenciones() {
                   value={formData.detalle}
                   onChange={handleInputChange}
                   placeholder="Ej. Cambio de bujías y filtros de aceite..."
-                  style={{ width: "100%", padding: "8px 12px", border: "1px solid #cbd5e1", borderRadius: "6px", fontSize: "14px", resize: "none", boxSizing: "border-box" }}
                 />
               </div>
 
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
-                <div>
-                  <label style={{ display: "block", fontSize: "13px", fontWeight: "600", marginBottom: "5px" }}>Fecha Ejecución</label>
+              <div className="form-row">
+                <div className="form-group">
+                  <label>Fecha Ejecución</label>
                   <input
                     type="date"
                     name="fecha"
                     required
                     value={formData.fecha}
                     onChange={handleInputChange}
-                    style={{ width: "100%", padding: "8px 12px", border: "1px solid #cbd5e1", borderRadius: "6px", fontSize: "14px", boxSizing: "border-box" }}
                   />
                 </div>
-                <div>
-                  <label style={{ display: "block", fontSize: "13px", fontWeight: "600", marginBottom: "5px" }}>Próxima Fecha</label>
+                <div className="form-group">
+                  <label>Próxima Fecha</label>
                   <input
                     type="date"
                     name="proximaFecha"
                     required
                     value={formData.proximaFecha}
                     onChange={handleInputChange}
-                    style={{ width: "100%", padding: "8px 12px", border: "1px solid #cbd5e1", borderRadius: "6px", fontSize: "14px", boxSizing: "border-box" }}
                   />
                 </div>
               </div>
 
-              <div>
-                <label style={{ display: "block", fontSize: "13px", fontWeight: "600", marginBottom: "5px" }}>Equipo del Condominio</label>
+              <div className="form-group">
+                <label>Equipo del Condominio</label>
                 <select
                   name="equipoId"
                   required
                   value={formData.equipoId}
                   onChange={handleInputChange}
-                  style={{ width: "100%", padding: "8px 12px", border: "1px solid #cbd5e1", borderRadius: "6px", fontSize: "14px", backgroundColor: "white", boxSizing: "border-box" }}
                 >
                   <option value="">-- Seleccione el Equipo --</option>
                   {equipos.map(eq => (
@@ -334,14 +575,13 @@ function Mantenciones() {
                 </select>
               </div>
 
-              <div>
-                <label style={{ display: "block", fontSize: "13px", fontWeight: "600", marginBottom: "5px" }}>Técnico Encargado</label>
+              <div className="form-group">
+                <label>Técnico Encargado</label>
                 <select
                   name="usuarioId"
                   required
                   value={formData.usuarioId}
                   onChange={handleInputChange}
-                  style={{ width: "100%", padding: "8px 12px", border: "1px solid #cbd5e1", borderRadius: "6px", fontSize: "14px", backgroundColor: "white", boxSizing: "border-box" }}
                 >
                   <option value="">-- Seleccione el Técnico --</option>
                   {usuarios.map(us => (
@@ -350,46 +590,45 @@ function Mantenciones() {
                 </select>
               </div>
 
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
-                <div>
-                  <label style={{ display: "block", fontSize: "13px", fontWeight: "600", marginBottom: "5px" }}>Estado Inicial</label>
-                  <select
-                    name="estado"
-                    value={formData.estado}
-                    onChange={handleInputChange}
-                    style={{ width: "100%", padding: "8px 12px", border: "1px solid #cbd5e1", borderRadius: "6px", fontSize: "14px", backgroundColor: "white", boxSizing: "border-box" }}
-                  >
+              <div className="form-row">
+                <div className="form-group">
+                  <label>Estado Inicial</label>
+                  <select name="estado" value={formData.estado} onChange={handleInputChange}>
                     <option value="AL_DIA">Al día</option>
                     <option value="PROXIMO">Preventivo</option>
                     <option value="VENCIDO">Crítico</option>
                   </select>
                 </div>
-                <div>
-                  <label style={{ display: "block", fontSize: "13px", fontWeight: "600", marginBottom: "5px" }}>Ruta Evidencia (Foto)</label>
+                <div className="form-group">
+                  <label>Evidencia (Foto)</label>
                   <input
-                    type="text"
-                    name="evidenciaUrl"
-                    value={formData.evidenciaUrl}
-                    onChange={handleInputChange}
-                    placeholder="evidencias/bomba.jpg"
-                    style={{ width: "100%", padding: "8px 12px", border: "1px solid #cbd5e1", borderRadius: "6px", fontSize: "14px", boxSizing: "border-box" }}
+                    type="file"
+                    accept="image/*"
+                    onChange={handleArchivoChange}
                   />
+                  {subiendoArchivo && <small>Subiendo imagen...</small>}
+                  {formData.evidenciaUrl && !subiendoArchivo && (
+                    <div style={{ marginTop: "6px" }}>
+                      <small>✅ Imagen cargada</small>
+                      <img
+                        src={`${BASE_URL}${formData.evidenciaUrl}`}
+                        alt="Vista previa evidencia"
+                        style={{ maxWidth: "120px", display: "block", marginTop: "4px", borderRadius: "6px" }}
+                      />
+                    </div>
+                  )}
                 </div>
               </div>
 
-              {/* Botonera de acciones footer */}
-              <div style={{ display: "flex", justifyContent: "flex-end", gap: "10px", marginTop: "12px", paddingTop: "14px", borderTop: "1px solid #e2e8f0" }}>
-                <button
-                  type="button"
-                  onClick={() => setIsModalOpen(false)}
-                  style={{ padding: "8px 16px", border: "1px solid #cbd5e1", borderRadius: "6px", backgroundColor: "white", cursor: "pointer", fontSize: "14px", fontWeight: "500" }}
-                >
+              {formError && (
+                <div className="form-error">❌ {formError}</div>
+              )}
+
+              <div className="modal-footer">
+                <button type="button" className="btn-cancelar" onClick={cerrarModal}>
                   Cancelar
                 </button>
-                <button
-                  type="submit"
-                  style={{ padding: "8px 16px", border: "none", borderRadius: "6px", backgroundColor: "#2563eb", color: "white", cursor: "pointer", fontSize: "14px", fontWeight: "600" }}
-                >
+                <button type="submit" className="btn-guardar">
                   Guardar Registro
                 </button>
               </div>
