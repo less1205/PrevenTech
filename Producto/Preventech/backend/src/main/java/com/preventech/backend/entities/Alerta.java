@@ -29,8 +29,8 @@ public class Alerta {
 
     private String tipo;
 
-    @JsonBackReference("mantencion-alerta")
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "mantencion_id")
+    @JsonBackReference("mantencion-alerta")
     private Mantencion mantencion;
 }

@@ -1,7 +1,8 @@
 package com.preventech.backend.entities;
 
 import java.util.List;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.preventech.backend.enums.Tipo;
 
 import jakarta.persistence.*;
@@ -26,7 +27,12 @@ public class Equipo {
     private String ubicacion;
     private String estado;
 
-    @OneToMany(mappedBy = "equipo", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonIgnoreProperties("equipo")
+    @OneToMany(
+        mappedBy = "equipo",
+        cascade = CascadeType.ALL,
+        orphanRemoval = true,
+        fetch = FetchType.LAZY
+    )
+    @JsonIgnore
     private List<Mantencion> mantenciones;
 }

@@ -40,7 +40,12 @@ public class Mantencion {
     @JsonIgnoreProperties("mantenciones")
     private Usuario usuario;
 
-    @OneToOne(mappedBy = "mantencion", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToOne(
+        mappedBy = "mantencion",
+        cascade = CascadeType.ALL,
+        orphanRemoval = true,
+        fetch = FetchType.LAZY
+    )
     @JsonManagedReference("mantencion-alerta")
     private Alerta alerta;
 }

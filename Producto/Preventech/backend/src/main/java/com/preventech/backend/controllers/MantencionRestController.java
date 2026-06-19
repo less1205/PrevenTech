@@ -56,6 +56,12 @@ public class MantencionRestController {
         return ResponseEntity.noContent().build();
     }
 
+    @PatchMapping("/{id}/resolver")
+    public ResponseEntity<String> resolver(@PathVariable Long id) {
+        mantencionService.resolver(id);
+        return ResponseEntity.ok("ok");
+    }
+
     @PatchMapping("/{id}/evidencia")
     public ResponseEntity<Mantencion> subirEvidencia(
             @PathVariable Long id,
@@ -87,7 +93,6 @@ public class MantencionRestController {
             Files.copy(file.getInputStream(), destino, StandardCopyOption.REPLACE_EXISTING);
 
             String url = "/uploads/evidencias/" + nombreArchivo;
-
             Mantencion actualizada = new Mantencion();
             actualizada.setEvidenciaUrl(url);
             return ResponseEntity.ok(mantencionService.actualizar(id, actualizada));

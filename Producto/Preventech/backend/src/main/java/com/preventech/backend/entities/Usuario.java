@@ -2,6 +2,7 @@ package com.preventech.backend.entities;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.preventech.backend.enums.Rol;
 
@@ -44,6 +45,10 @@ public class Usuario {
     private Rol rol;
 
     @JsonIgnoreProperties("usuario")
-    @OneToMany(mappedBy = "usuario")
+    @OneToMany(
+        mappedBy = "usuario",
+        fetch = FetchType.LAZY
+    )
+    @JsonIgnore
     private List<Mantencion> mantenciones;
 }

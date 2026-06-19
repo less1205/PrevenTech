@@ -35,10 +35,26 @@ function Mantenciones() {
     detalle: "",
     evidenciaUrl: "",
     proximaFecha: "",
-    estado: "AL_DIA",
     equipoId: "",
     usuarioId: ""
   });
+
+  const hoy = new Date().toISOString().split("T")[0];
+
+  const estadoCalculado = (() => {
+    if (!formData.proximaFecha) return "";
+
+    const fechaProxima = new Date(formData.proximaFecha);
+    const fechaHoy = new Date(hoy);
+
+    const diasRestantes = Math.ceil(
+      (fechaProxima - fechaHoy) / (1000 * 60 * 60 * 24)
+    );
+
+    if (diasRestantes < 0) return "VENCIDO";
+    if (diasRestantes <= 30) return "PROXIMO";
+    return "AL_DIA";
+  })();
 
   const cargarMantenciones = () => {
     obtenerMantenciones()
@@ -62,7 +78,6 @@ function Mantenciones() {
     }
   }, [isModalOpen]);
 
-  // Cerrar drawer con Escape
   useEffect(() => {
     const handler = (e) => { if (e.key === "Escape") setDrawerMantencion(null); };
     window.addEventListener("keydown", handler);
@@ -154,36 +169,55 @@ function Mantenciones() {
   const handleFormSubmit = (e) => {
     e.preventDefault();
 
+    setFormError("");
+
+    if (formData.fecha > hoy) {
+      setFormError("La fecha de ejecución no puede ser posterior a hoy.");
+      return;
+    }
+
+    if (formData.proximaFecha <= formData.fecha) {
+      setFormError(
+        "La próxima mantención debe ser posterior a la fecha de ejecución."
+      );
+      return;
+    }
+
     const payload = {
       fecha: formData.fecha,
       detalle: formData.detalle,
       evidenciaUrl: formData.evidenciaUrl || null,
       proximaFecha: formData.proximaFecha,
-      estado: formData.estado,
+      estado: estadoCalculado,
       equipo: { id: parseInt(formData.equipoId) },
       usuario: { id: parseInt(formData.usuarioId) }
     };
 
-    setFormError("");
     crearMantencion(payload)
       .then(() => {
         cerrarModal();
+
         setFormData({
           fecha: "",
           detalle: "",
           evidenciaUrl: "",
           proximaFecha: "",
-          estado: "AL_DIA",
           equipoId: "",
           usuarioId: ""
         });
+
         cargarMantenciones();
       })
       .catch(err => {
         console.error(err);
+
         const msg = err.message || "Error al guardar la mantención.";
         setFormError(msg);
-        if (msg.toLowerCase().includes("sesión") || msg.toLowerCase().includes("sesion")) {
+
+        if (
+          msg.toLowerCase().includes("sesión") ||
+          msg.toLowerCase().includes("sesion")
+        ) {
           setTimeout(() => {
             localStorage.removeItem("token");
             window.location.href = "/";
@@ -316,7 +350,6 @@ function Mantenciones() {
         </table>
       </div>
 
-      {/* Drawer lateral de detalle */}
       <AnimatePresence>
         {drawerMantencion && (
           <>
@@ -419,7 +452,6 @@ function Mantenciones() {
         )}
       </AnimatePresence>
 
-      {/* Modal vista previa de imagen */}
       {imagenVistaPrevia && (
         <div className="modal-overlay" onClick={() => setImagenVistaPrevia(null)}>
           <div
@@ -452,7 +484,6 @@ function Mantenciones() {
         </div>
       )}
 
-      {/* Modal subir/reemplazar evidencia en mantención existente */}
       {modalEvidencia && (
         <div className="modal-overlay" onClick={cerrarModalEvidencia}>
           <div
@@ -513,7 +544,6 @@ function Mantenciones() {
         </div>
       )}
 
-      {/* Modal nuevo registro */}
       {isModalOpen && (
         <div className="modal-overlay">
           <div className="modal-card">
@@ -544,6 +574,7 @@ function Mantenciones() {
                     type="date"
                     name="fecha"
                     required
+                    max={hoy}
                     value={formData.fecha}
                     onChange={handleInputChange}
                   />
@@ -554,6 +585,7 @@ function Mantenciones() {
                     type="date"
                     name="proximaFecha"
                     required
+                    min={formData.fecha || undefined}
                     value={formData.proximaFecha}
                     onChange={handleInputChange}
                   />
@@ -591,14 +623,21 @@ function Mantenciones() {
               </div>
 
               <div className="form-row">
+                {/* ── ESTADO CALCULADO con badge de color ── */}
                 <div className="form-group">
-                  <label>Estado Inicial</label>
-                  <select name="estado" value={formData.estado} onChange={handleInputChange}>
-                    <option value="AL_DIA">Al día</option>
-                    <option value="PROXIMO">Preventivo</option>
-                    <option value="VENCIDO">Crítico</option>
-                  </select>
+                  <label>Estado Calculado</label>
+                  <div style={{ paddingTop: "6px" }}>
+                    {estadoCalculado === "AL_DIA"  && <span className="estado verde">Al día</span>}
+                    {estadoCalculado === "PROXIMO" && <span className="estado amarillo">Preventivo</span>}
+                    {estadoCalculado === "VENCIDO" && <span className="estado rojo">Crítico</span>}
+                    {!estadoCalculado && (
+                      <span style={{ color: "#aaa", fontSize: "13px" }}>
+                        Se calculará al ingresar la próxima fecha
+                      </span>
+                    )}
+                  </div>
                 </div>
+
                 <div className="form-group">
                   <label>Evidencia (Foto)</label>
                   <input
