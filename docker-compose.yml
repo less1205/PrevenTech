@@ -1,0 +1,39 @@
+services:
+  # 1. Base de datos MySQL
+  db:
+    image: mysql:8.0
+    restart: always
+    environment:
+      MYSQL_DATABASE: base
+      MYSQL_ROOT_PASSWORD: root_password_segura
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+  # 2. Backend Spring Boot (Ruta corregida con la nueva subcarpeta)
+  backend:
+    build: ./producto/Preventech/backend       # <-- Añadimos /Preventech/
+    restart: always
+    ports:
+      - "8080:8080"
+    environment:
+      - DB_HOST=db
+      - DB_PORT=3306
+      - DB_NAME=base
+      - DB_USER=root
+      - DB_PASSWORD=root_password_segura
+    depends_on:
+      - db
+
+  # 3. Frontend React (Ruta corregida con la nueva subcarpeta)
+  frontend:
+    build: ./producto/Preventech/frontend      # <-- Añadimos /Preventech/
+    restart: always
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+
+volumes:
+  mysql_data:
