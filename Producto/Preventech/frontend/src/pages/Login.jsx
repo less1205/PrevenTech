@@ -32,7 +32,7 @@ function Login() {
     try {
 
       const response = await fetch(
-        "https://preventech.onrender.com",
+        "https://preventech.onrender.com/auth/login",
         {
           method: "POST",
 
