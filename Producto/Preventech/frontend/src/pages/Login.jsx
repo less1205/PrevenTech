@@ -32,7 +32,7 @@ function Login() {
     try {
 
       const response = await fetch(
-        "http://localhost:8080/auth/login",
+        "https://preventech.onrender.com/auth/login",
         {
           method: "POST",
 
